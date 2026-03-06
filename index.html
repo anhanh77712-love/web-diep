@@ -263,7 +263,7 @@
         }
 
         function loadWords() {
-            fetch('http://localhost:3000/api/words').then(res => res.json()).then(data => {
+            fetch('/api/words').then(res => res.json()).then(data => {
                 const tbody = document.getElementById('wordTableBody'); tbody.innerHTML = ''; 
                 data.forEach(word => {
                     const tr = document.createElement('tr');
@@ -298,18 +298,18 @@
         function executeAdd() {
             const word = document.getElementById('addWordInput').value.trim(), part = document.getElementById('addPartInput').value.trim(), mean = document.getElementById('addMeanInput').value.trim();
             if(!word || !part || !mean) return showToast("Vui lòng điền đủ thông tin!", "error");
-            fetch('http://localhost:3000/api/add-word', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ word, part_of_speech: part, mean }) })
+            fetch('/api/add-word', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ word, part_of_speech: part, mean }) })
             .then(res => res.json()).then(result => { closeModal('addModal'); showToast(result.message, 'success'); loadWords(); }).catch(err => showToast("Lỗi thêm từ!", "error"));
         }
         function openDeleteModal(id) { currentDeleteId = id; document.getElementById('deleteModal').style.display = 'block'; }
         function executeDelete() {
-            fetch(`http://localhost:3000/api/words/${currentDeleteId}`, { method: 'DELETE' }).then(res => res.json()).then(result => { closeModal('deleteModal'); showToast("Đã xóa từ vựng thành công!", 'success'); loadWords(); }).catch(err => showToast('Lỗi xóa từ!', 'error'));
+            fetch(`/api/words/${currentDeleteId}`, { method: 'DELETE' }).then(res => res.json()).then(result => { closeModal('deleteModal'); showToast("Đã xóa từ vựng thành công!", 'success'); loadWords(); }).catch(err => showToast('Lỗi xóa từ!', 'error'));
         }
         function openEditModal(id, oldWord, oldPart, oldMean) { currentEditId = id; document.getElementById('editWordInput').value = oldWord; document.getElementById('editPartInput').value = oldPart; document.getElementById('editMeanInput').value = oldMean; document.getElementById('editModal').style.display = 'block'; }
         function executeEdit() {
             const data = { word: document.getElementById('editWordInput').value.trim(), part_of_speech: document.getElementById('editPartInput').value.trim(), mean: document.getElementById('editMeanInput').value.trim() };
             if(!data.word || !data.part_of_speech || !data.mean) return showToast("Không để trống thông tin!", "error");
-            fetch(`http://localhost:3000/api/words/${currentEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
+            fetch(`/api/words/${currentEditId}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) })
             .then(res => res.json()).then(result => { closeModal('editModal'); showToast("Đã cập nhật từ vựng thành công!", 'success'); loadWords(); }).catch(err => showToast('Lỗi sửa từ!', 'error'));
         }
         loadWords();
@@ -341,7 +341,7 @@
             isGameLocked = false;
 
             // Gọi API lấy toàn bộ từ vựng
-            fetch('http://localhost:3000/api/words')
+            fetch('/api/words')
             .then(res => res.json())
             .then(data => {
                 if(data.length < 2) {

@@ -1,110 +1,103 @@
-// --- BIẾN TOÀN CỤC LƯU DỮ LIỆU AI TẠM THỜI ---
-        let currentAIData = null;
+require('dotenv').config();
+const express = require('express');
+const { Pool } = require('pg');
+const cors = require('cors');
+const { GoogleGenerativeAI } = require('@google/generative-ai');
 
-        // --- TAB 3: LOGIC GỌI AI TRỢ GIẢNG THẬT ---
-        async function askAIAssistant() {
-            const word = document.getElementById('aiInputWord').value.trim();
-            if(!word) { alert("Hãy nhập một từ để AI phân tích nhé!"); return; }
+const app = express();
+app.use(cors());
+app.use(express.json());
 
-            document.getElementById('aiResultCard').style.display = 'none';
-            document.getElementById('aiLoading').style.display = 'block';
+// 1. Khởi tạo AI AN TOÀN (Chống sập nếu quên gắn Key trên Vercel)
+let genAI = null;
+if (process.env.GEMINI_API_KEY) {
+  genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
+} else {
+  console.warn("⚠️ CẢNH BÁO: Chưa cấu hình GEMINI_API_KEY. Tính năng AI sẽ tạm tắt.");
+}
 
-            try {
-                // Gọi lên Server Node.js của chúng ta
-                const response = await fetch('/api/ai-analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ word: word })
-                });
+// 2. Kết nối Database
+if (!process.env.DATABASE_URL) {
+  console.error("❌ LỖI NGHIÊM TRỌNG: Chưa cấu hình DATABASE_URL trên Vercel!");
+}
 
-                if (!response.ok) throw new Error("Lỗi kết nối AI");
-                const aiData = await response.json();
-                
-                // Lưu tạm để nếu người dùng muốn "Lưu vào sổ tay"
-                currentAIData = aiData;
-                
-                // Render Gia đình từ (Tags)
-                let familyHTML = '';
-                if (aiData.family && aiData.family.length > 0) {
-                    aiData.family.forEach(f => {
-                        let tagClass = "tag-noun";
-                        if (f.pos.toLowerCase().includes('động') || f.pos.toLowerCase().includes('verb')) tagClass = "tag-verb";
-                        if (f.pos.toLowerCase().includes('tính') || f.pos.toLowerCase().includes('adj')) tagClass = "tag-adj";
-                        familyHTML += `<span class="tag ${tagClass}">${f.pos}: <b>${f.word}</b> (${f.mean})</span>`;
-                    });
-                } else {
-                    familyHTML = `<span style="color:#888;">Không có từ họ hàng phổ biến.</span>`;
-                }
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false }
+});
 
-                // Render Ví dụ
-                let examplesHTML = '';
-                if (aiData.examples && aiData.examples.length > 0) {
-                    aiData.examples.forEach(ex => {
-                        examplesHTML += `
-                        <div class="ai-example-box">
-                            <p class="ai-example-en">"${ex.en}"</p>
-                            <p class="ai-example-vi">"${ex.vi}"</p>
-                        </div>`;
-                    });
-                }
+pool.connect(async (err, client, release) => {
+  if (err) return console.error('Lỗi kết nối database:', err.message);
+  console.log('✨ Đã kết nối Supabase PostgreSQL!');
+  try {
+    await client.query(`CREATE TABLE IF NOT EXISTS vocabulary (id SERIAL PRIMARY KEY, word TEXT NOT NULL, part_of_speech TEXT NOT NULL, mean TEXT NOT NULL, pronunciation TEXT DEFAULT '', examples TEXT DEFAULT '')`);
+  } catch (error) { console.error('Lỗi khởi tạo bảng:', error); } finally { if(release) release(); }
+});
 
-                // Lắp ráp HTML
-                const resultHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
-                        <div>
-                            <h2 class="ai-word-title">${aiData.word.charAt(0).toUpperCase() + aiData.word.slice(1)}</h2>
-                            <span class="ai-phonetic">${aiData.phonetic}</span>
-                            <button class="btn btn-audio" onclick="speakWord('${aiData.word.replace(/'/g, "\\'")}')" style="margin-top:-5px;"><i class="fas fa-volume-up"></i> Nghe đọc</button>
-                        </div>
-                        <button class="btn btn-success" onclick="saveAIToHandbook()" title="Chuyển dữ liệu sang form Thêm từ"><i class="fas fa-save"></i> Lưu vào Sổ tay</button>
-                    </div>
-                    
-                    <div class="ai-section" style="margin-top: 20px;">
-                        <h4><i class="fas fa-book-reader"></i> Định nghĩa chính</h4>
-                        <p style="font-size: 16px; color: #4a4a4a; margin: 0;"><b>[${aiData.pos}]:</b> ${aiData.mean}</p>
-                    </div>
+// --- CÁC API TỪ VỰNG ---
+app.get('/api/words', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT * FROM vocabulary ORDER BY id DESC');
+    res.json(result.rows);
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
-                    <div class="ai-section">
-                        <h4><i class="fas fa-sitemap"></i> Gia đình từ (Word Family)</h4>
-                        <div class="word-family-tags">${familyHTML}</div>
-                    </div>
+app.post('/api/add-word', async (req, res) => {
+  const { word, part_of_speech, mean, pronunciation, examples } = req.body;
+  try {
+    const result = await pool.query(`INSERT INTO vocabulary (word, part_of_speech, mean, pronunciation, examples) VALUES ($1, $2, $3, $4, $5) RETURNING id`, [word, part_of_speech, mean, pronunciation || '', examples || '']);
+    res.json({ message: "Thành công!", id: result.rows[0].id });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
-                    <div class="ai-section">
-                        <h4><i class="fas fa-quote-left"></i> Câu ví dụ minh họa</h4>
-                        ${examplesHTML}
-                    </div>
-                `;
+app.put('/api/words/:id', async (req, res) => {
+  const { word, part_of_speech, mean, pronunciation, examples } = req.body;
+  try {
+    await pool.query(`UPDATE vocabulary SET word = $1, part_of_speech = $2, mean = $3, pronunciation = $4, examples = $5 WHERE id = $6`, [word, part_of_speech, mean, pronunciation || '', examples || '', req.params.id]);
+    res.json({ message: "Đã cập nhật!" });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
-                document.getElementById('aiLoading').style.display = 'none';
-                const resultCard = document.getElementById('aiResultCard');
-                resultCard.innerHTML = resultHTML;
-                resultCard.style.display = 'block';
+app.delete('/api/words/:id', async (req, res) => {
+  try {
+    await pool.query(`DELETE FROM vocabulary WHERE id = $1`, [req.params.id]);
+    res.json({ message: "Đã xóa!" });
+  } catch (err) { res.status(500).json({ error: err.message }); }
+});
 
-            } catch (error) {
-                console.error(error);
-                document.getElementById('aiLoading').style.display = 'none';
-                alert("Ối! Phép thuật bị gián đoạn. AI đang nghỉ ngơi, bạn hãy thử lại nhé!");
-            }
-        }
+// --- API PHÂN TÍCH AI ---
+app.post('/api/ai-analyze', async (req, res) => {
+  if (!genAI) return res.status(500).json({ error: "Máy chủ chưa được gắn chìa khóa AI (GEMINI_API_KEY)!" });
+  
+  const { word } = req.body;
+  if (!word) return res.status(400).json({ error: "Chưa nhập từ cần phân tích" });
 
-        // --- HÀM TIỆN ÍCH: CHUYỂN DATA AI SANG FORM THÊM TỪ ---
-        function saveAIToHandbook() {
-            if(!currentAIData) return;
-            
-            // Chuyển sang Tab 1
-            openTab({ currentTarget: document.querySelectorAll('.tab-links')[0] }, 'tab1');
-            
-            // Mở Modal Thêm Từ
-            openAddModal();
-            
-            // Điền sẵn dữ liệu AI vừa phân tích
-            document.getElementById('inpWord').value = currentAIData.word;
-            document.getElementById('inpPronun').value = currentAIData.phonetic;
-            document.getElementById('inpPart').value = currentAIData.pos;
-            document.getElementById('inpMean').value = currentAIData.mean;
-            
-            // Lấy 1 câu ví dụ đầu tiên (nếu có)
-            if(currentAIData.examples && currentAIData.examples.length > 0) {
-                document.getElementById('inpExample').value = currentAIData.examples[0].en + " (" + currentAIData.examples[0].vi + ")";
-            }
-        }
+  try {
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = `Bạn là một chuyên gia tiếng Anh. Hãy phân tích từ "${word}".
+    Trả về CHỈ một chuỗi JSON hợp lệ theo đúng định dạng sau, tuyệt đối không có ký tự markdown (như \`\`\`json):
+    {
+      "word": "${word}",
+      "phonetic": "phiên âm quốc tế IPA",
+      "pos": "Loại từ chính (vd: Noun, Verb...)",
+      "mean": "Nghĩa tiếng Việt ngắn gọn",
+      "family": [
+        {"pos": "Danh từ/Động từ/Tính từ...", "word": "từ liên quan", "mean": "nghĩa"}
+      ],
+      "examples": [
+        {"en": "Câu ví dụ 1 tiếng Anh", "vi": "Dịch nghĩa 1 tiếng Việt"}
+      ]
+    }`;
+
+    const result = await model.generateContent(prompt);
+    let text = await result.response.text();
+    text = text.replace(/```json/g, "").replace(/```/g, "").trim();
+    const data = JSON.parse(text);
+    res.json(data);
+  } catch (err) {
+    console.error("Lỗi AI:", err);
+    res.status(500).json({ error: "AI đang bận, vui lòng thử lại sau!" });
+  }
+});
+
+app.listen(process.env.PORT || 3000, () => { console.log('🚀 Server đã chạy!'); });

@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* CSS MẶC ĐỊNH (RÚT GỌN TỪ BẢN CỦA BẠN) */
+        /* CSS MẶC ĐỊNH */
         body { font-family: 'Nunito', sans-serif; margin: 0; padding: 20px; background: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; min-height: 100vh; color: #4a4a4a; }
         .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15); }
         .tab-menu { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; }
@@ -26,6 +26,7 @@
         .btn-info { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: #333; }
         .btn-warning { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
         .btn-danger { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+        .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
         
         /* Modal Style */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; }
@@ -34,17 +35,23 @@
         .form-group input, .form-group textarea { padding: 10px; border: 1px solid #ccc; border-radius: 10px; font-family: 'Nunito'; }
         .close-btn { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; color: #aaa; }
 
-        /* Bảng chi tiết từ vựng */
         .detail-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        .detail-table th { background: #f0f0f0; width: 35%; text-align: right; padding-right: 15px; color: #666; }
-        .detail-table td { background: #fafafa; font-weight: 600; color: #333; }
+        .detail-table th { background: #f0f0f0; width: 35%; text-align: right; padding-right: 15px; color: #666; border-radius: 10px 0 0 10px; }
+        .detail-table td { background: #fafafa; font-weight: 600; color: #333; border-radius: 0 10px 10px 0;}
+
+        /* --- CSS CHO MENU GAME --- */
+        .game-menu-card {
+            background: rgba(255, 255, 255, 0.9); border: 2px dashed #ffb6c1; border-radius: 20px; padding: 30px;
+            text-align: center; cursor: pointer; transition: 0.3s; margin: 10px; display: inline-block; width: 220px;
+        }
+        .game-menu-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 20px rgba(255, 182, 193, 0.4); border-style: solid; }
 
         /* Nút game */
         #gameBoard { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 20px; }
-        .card { background: white; border: 2px solid #eee; border-radius: 15px; padding: 20px 10px; text-align: center; font-weight: 800; cursor: pointer; transition: 0.3s; }
-        .card.selected { background: #2d3436; color: white; border-color: #2d3436; transform: translateY(-8px); }
-        .card.correct { background: #55efc4; color: #00b894; border-color: #55efc4; transform: scale(0.95); pointer-events: none; }
-        .card.wrong { background: #ff7675; color: white; border-color: #d63031; animation: shake 0.4s ease; }
+        .card { background: white; border: 2px solid #eee; border-radius: 15px; padding: 20px 10px; text-align: center; font-weight: 800; cursor: pointer; transition: 0.3s; user-select: none;}
+        .card.selected { background: #2d3436; color: white; border-color: #2d3436; transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        .card.correct { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #fff; border-color: #84fab0; transform: scale(0.95); pointer-events: none; }
+        .card.wrong { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: white; border-color: #ff9a9e; animation: shake 0.4s ease; }
         @keyframes shake { 0%, 100% { transform: translateX(0); } 25%, 75% { transform: translateX(-5px); } 50% { transform: translateX(5px); } }
     </style>
 </head>
@@ -58,7 +65,7 @@
     </div>
 
     <div id="tab1" class="tab-content active glass-panel">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
             <h2 style="margin:0; color: #6c5ce7;"><i class="fas fa-list-ul"></i> Danh Sách Từ Vựng</h2>
             <button class="btn btn-success" onclick="openAddModal()"><i class="fas fa-plus"></i> Thêm từ mới</button>
         </div>
@@ -77,11 +84,27 @@
     </div>
 
     <div id="tab2" class="tab-content glass-panel">
-        <div style="text-align: center;">
-            <h2 style="color: #6c5ce7;">🎮 Trò chơi: Diệp thúi đáng géc</h2>
-            <button class="btn btn-success" onclick="startMatchingGame()" style="padding: 12px 25px; font-size: 16px;">Bắt đầu phép thuật</button>
+        
+        <div id="gameMenuScreen" style="text-align: center;">
+            <h2 style="color: #6c5ce7; margin-bottom: 30px;"><i class="fas fa-shapes"></i> Chọn trò chơi để bắt đầu</h2>
+            
+            <div class="game-menu-card" onclick="openGame('diepthui')">
+                <i class="fas fa-heart" style="font-size: 50px; color: #ff7675; margin-bottom: 15px;"></i>
+                <h3 style="margin: 10px 0; color: #2d3436;">Diệp thúi đáng géc 🌸</h3>
+                <p style="color: #636e72; font-size: 14px; margin-bottom: 0;">Ghép cặp từ vựng và nghĩa tiếng Việt</p>
+            </div>
+
+            </div>
+
+        <div id="gamePlayScreen" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #eee; padding-bottom: 15px; margin-bottom: 15px;">
+                <button class="btn btn-warning" onclick="backToGameMenu()"><i class="fas fa-arrow-left"></i> Quay lại</button>
+                <h2 id="gameTitle" style="margin: 0; color: #ff7675;">🌸 Diệp thúi đáng géc 🌸</h2>
+                <button class="btn btn-info" onclick="startMatchingGame()"><i class="fas fa-sync-alt"></i> Làm mới</button>
+            </div>
+            <div id="gameBoard"></div>
         </div>
-        <div id="gameBoard"></div>
+
     </div>
 
     <div id="detailModal" class="modal-overlay">
@@ -91,7 +114,7 @@
             <table class="detail-table">
                 <tr><th>ID</th><td id="detId"></td></tr>
                 <tr><th>Từ vựng</th><td id="detWord" style="color: #6c5ce7; font-size: 18px;"></td></tr>
-                <tr><th>Cách phát âm</th><td id="detPronun" style="color: #e84393;"></td></tr>
+                <tr><th>Phát âm</th><td id="detPronun" style="color: #e84393;"></td></tr>
                 <tr><th>Dạng từ</th><td id="detPart"></td></tr>
                 <tr><th>Nghĩa VN</th><td id="detMean"></td></tr>
                 <tr><th>Ví dụ</th><td id="detExample" style="font-style: italic; color: #555;"></td></tr>
@@ -115,6 +138,7 @@
     </div>
 
     <script>
+        // --- LOGIC GIAO DIỆN CHUNG ---
         let currentWords = [];
         let editingId = null;
 
@@ -124,10 +148,9 @@
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
-
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- GỌI API TRÊN VERCEL (Dùng đường dẫn tương đối /api/...) ---
+        // --- GỌI API (TAB 1) ---
         async function loadWords() {
             try {
                 const res = await fetch('/api/words');
@@ -152,7 +175,6 @@
             } catch (err) { console.error("Lỗi tải dữ liệu", err); }
         }
 
-        // --- CHỨC NĂNG XEM CHI TIẾT ---
         function showDetails(id) {
             const word = currentWords.find(w => w.id === id);
             if(word) {
@@ -161,12 +183,11 @@
                 document.getElementById('detPronun').innerText = word.pronunciation || '(Chưa có)';
                 document.getElementById('detPart').innerText = word.part_of_speech;
                 document.getElementById('detMean').innerText = word.mean;
-                document.getElementById('detExample').innerText = word.examples || '(Chưa có câu ví dụ)';
+                document.getElementById('detExample').innerText = word.examples || '(Chưa có)';
                 document.getElementById('detailModal').style.display = 'block';
             }
         }
 
-        // --- THÊM & SỬA ---
         function openAddModal() {
             editingId = null;
             document.getElementById('modalTitle').innerText = '✨ Thêm Từ Mới ✨';
@@ -200,12 +221,9 @@
                 mean: document.getElementById('inpMean').value,
                 examples: document.getElementById('inpExample').value
             };
-            
             if(!data.word || !data.part_of_speech || !data.mean) return alert("Vui lòng điền các ô có dấu (*)");
-
             const method = editingId ? 'PUT' : 'POST';
             const url = editingId ? `/api/words/${editingId}` : '/api/add-word';
-
             await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
             closeModal('actionModal');
             loadWords();
@@ -218,12 +236,47 @@
             }
         }
 
-        // --- GAME DIỆP THÚI (Đã sửa đường dẫn api) ---
+        // ==========================================
+        // LOGIC CHUYỂN MÀN HÌNH GAME (MỚI)
+        // ==========================================
+        function openGame(gameType) {
+            // Ẩn menu chọn, hiện giao diện chơi
+            document.getElementById('gameMenuScreen').style.display = 'none';
+            document.getElementById('gamePlayScreen').style.display = 'block';
+            
+            // Xóa dữ liệu ván cũ trên bàn
+            document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang niệm phép lấy từ vựng...</p>';
+
+            if (gameType === 'diepthui') {
+                document.getElementById('gameTitle').innerHTML = '🌸 Diệp thúi đáng géc 🌸';
+                startMatchingGame();
+            }
+        }
+
+        function backToGameMenu() {
+            // Hiện lại menu chọn, ẩn giao diện chơi
+            document.getElementById('gameMenuScreen').style.display = 'block';
+            document.getElementById('gamePlayScreen').style.display = 'none';
+            
+            // Reset lại trạng thái chọn bài
+            selectedCards = [];
+            canClick = true;
+        }
+
+        // --- GAME DIỆP THÚI ---
         let selectedCards = [], canClick = true;
         async function startMatchingGame() {
+            // Đặt lại bàn cờ và lấy dữ liệu mới
+            document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang xào bài...</p>';
+            selectedCards = [];
+            canClick = true;
+
             const res = await fetch('/api/words');
             const data = await res.json();
-            if (data.length < 2) return alert("Cần ít nhất 2 từ để chơi!");
+            if (data.length < 2) {
+                document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%; color: red;">Cần ít nhất 2 từ vựng để chơi!</p>';
+                return;
+            }
 
             const picked = data.sort(() => 0.5 - Math.random()).slice(0, 30);
             let gameData = [];
@@ -267,7 +320,6 @@
             }
         }
 
-        // Tải dữ liệu lần đầu
         loadWords();
     </script>
 </body>

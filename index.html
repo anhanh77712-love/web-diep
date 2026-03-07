@@ -32,7 +32,8 @@
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; }
         .modal-box { background: white; margin: 5% auto; padding: 30px; border-radius: 20px; width: 450px; position: relative; max-height: 85vh; overflow-y: auto; }
         .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
-        .form-group input, .form-group textarea { padding: 10px; border: 1px solid #ccc; border-radius: 10px; font-family: 'Nunito'; }
+        .form-group input, .form-group textarea { padding: 10px; border: 1px solid #ccc; border-radius: 10px; font-family: 'Nunito'; outline: none; }
+        .form-group input:focus, .form-group textarea:focus { border-color: #a8edea; }
         .close-btn { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; color: #aaa; }
 
         .detail-table { width: 100%; border-collapse: collapse; margin-top: 15px; }
@@ -46,9 +47,23 @@
         }
         .game-menu-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 20px rgba(255, 182, 193, 0.4); border-style: solid; }
 
-        /* Nút game */
+        /* --- NÚT GAME & PHÂN BIỆT MÀU SẮC TỪ/NGHĨA --- */
         #gameBoard { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 20px; }
-        .card { background: white; border: 2px solid #eee; border-radius: 15px; padding: 20px 10px; text-align: center; font-weight: 800; cursor: pointer; transition: 0.3s; user-select: none;}
+        
+        .card { 
+            border: 2px solid #eee; border-radius: 15px; padding: 20px 10px; text-align: center; 
+            font-weight: 800; cursor: pointer; transition: 0.3s; user-select: none;
+        }
+
+        /* Màu thẻ Từ Tiếng Anh (Xanh dương nhạt) */
+        .card.type-word { background: #f0f4ff; border-color: #d2e3fc; color: #4a4a4a; }
+        .card.type-word:hover { border-color: #a1c4fd; box-shadow: 0 4px 10px rgba(161, 196, 253, 0.3); }
+
+        /* Màu thẻ Nghĩa Tiếng Việt (Hồng đào nhạt) */
+        .card.type-mean { background: #fff0f5; border-color: #fce4ec; color: #4a4a4a; }
+        .card.type-mean:hover { border-color: #ffb6c1; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3); }
+
+        /* Trạng thái Click, Đúng, Sai (Ghi đè màu mặc định) */
         .card.selected { background: #2d3436; color: white; border-color: #2d3436; transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .card.correct { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #fff; border-color: #84fab0; transform: scale(0.95); pointer-events: none; }
         .card.wrong { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: white; border-color: #ff9a9e; animation: shake 0.4s ease; }
@@ -93,14 +108,17 @@
                 <h3 style="margin: 10px 0; color: #2d3436;">Diệp thúi đáng géc 🌸</h3>
                 <p style="color: #636e72; font-size: 14px; margin-bottom: 0;">Ghép cặp từ vựng và nghĩa tiếng Việt</p>
             </div>
-
-            </div>
+        </div>
 
         <div id="gamePlayScreen" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #eee; padding-bottom: 15px; margin-bottom: 15px;">
                 <button class="btn btn-warning" onclick="backToGameMenu()"><i class="fas fa-arrow-left"></i> Quay lại</button>
                 <h2 id="gameTitle" style="margin: 0; color: #ff7675;">🌸 Diệp thúi đáng géc 🌸</h2>
                 <button class="btn btn-info" onclick="startMatchingGame()"><i class="fas fa-sync-alt"></i> Làm mới</button>
+            </div>
+            <div style="text-align: center; margin-bottom: 15px; font-size: 14px; color: #888;">
+                <span style="display:inline-block; width: 15px; height: 15px; background: #f0f4ff; border: 1px solid #d2e3fc; border-radius: 3px; vertical-align: middle; margin-right: 5px;"></span> Tiếng Anh 
+                <span style="display:inline-block; width: 15px; height: 15px; background: #fff0f5; border: 1px solid #fce4ec; border-radius: 3px; vertical-align: middle; margin-left: 15px; margin-right: 5px;"></span> Tiếng Việt
             </div>
             <div id="gameBoard"></div>
         </div>
@@ -236,17 +254,11 @@
             }
         }
 
-        // ==========================================
-        // LOGIC CHUYỂN MÀN HÌNH GAME (MỚI)
-        // ==========================================
+        // --- LOGIC CHUYỂN MÀN HÌNH GAME ---
         function openGame(gameType) {
-            // Ẩn menu chọn, hiện giao diện chơi
             document.getElementById('gameMenuScreen').style.display = 'none';
             document.getElementById('gamePlayScreen').style.display = 'block';
-            
-            // Xóa dữ liệu ván cũ trên bàn
             document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang niệm phép lấy từ vựng...</p>';
-
             if (gameType === 'diepthui') {
                 document.getElementById('gameTitle').innerHTML = '🌸 Diệp thúi đáng géc 🌸';
                 startMatchingGame();
@@ -254,19 +266,15 @@
         }
 
         function backToGameMenu() {
-            // Hiện lại menu chọn, ẩn giao diện chơi
             document.getElementById('gameMenuScreen').style.display = 'block';
             document.getElementById('gamePlayScreen').style.display = 'none';
-            
-            // Reset lại trạng thái chọn bài
             selectedCards = [];
             canClick = true;
         }
 
-        // --- GAME DIỆP THÚI ---
+        // --- GAME DIỆP THÚI CÓ PHÂN BIỆT MÀU ---
         let selectedCards = [], canClick = true;
         async function startMatchingGame() {
-            // Đặt lại bàn cờ và lấy dữ liệu mới
             document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang xào bài...</p>';
             selectedCards = [];
             canClick = true;
@@ -280,40 +288,56 @@
 
             const picked = data.sort(() => 0.5 - Math.random()).slice(0, 30);
             let gameData = [];
+            
+            // Gắn thêm thuộc tính type để phân biệt màu sắc
             picked.forEach(w => {
-                gameData.push({ id: w.id, text: w.word });
-                gameData.push({ id: w.id, text: w.mean });
+                gameData.push({ id: w.id, text: w.word, type: 'type-word' });
+                gameData.push({ id: w.id, text: w.mean, type: 'type-mean' });
             });
+            
             gameData.sort(() => 0.5 - Math.random());
 
             const board = document.getElementById('gameBoard');
             board.innerHTML = '';
             gameData.forEach(item => {
                 const card = document.createElement('div');
-                card.className = 'card';
+                // Nạp class CSS tương ứng (xanh cho từ, hồng cho nghĩa)
+                card.className = `card ${item.type}`;
                 card.innerText = item.text;
-                card.onclick = () => handleCardClick(card, item.id);
+                card.onclick = () => handleCardClick(card, item.id, item.type);
                 board.appendChild(card);
             });
         }
 
-        function handleCardClick(card, id) {
+        function handleCardClick(card, id, baseClass) {
             if (!canClick || card.classList.contains('correct')) return;
-            if (card.classList.contains('selected')) { card.classList.remove('selected'); selectedCards = []; return; }
             
-            card.classList.add('selected');
-            selectedCards.push({ card, id });
+            // Hủy chọn
+            if (card.classList.contains('selected')) { 
+                card.className = `card ${baseClass}`; // Trả về màu gốc
+                selectedCards = []; 
+                return; 
+            }
+            
+            card.className = `card ${baseClass} selected`; // Giữ màu gốc, thêm hiệu ứng đen
+            selectedCards.push({ card, id, baseClass });
 
             if (selectedCards.length === 2) {
                 canClick = false;
                 const [c1, c2] = selectedCards;
                 if (c1.id === c2.id) {
-                    c1.card.className = 'card correct'; c2.card.className = 'card correct';
+                    // Đúng -> Xóa mọi class cũ, chèn class correct
+                    c1.card.className = 'card correct'; 
+                    c2.card.className = 'card correct';
                     selectedCards = []; canClick = true;
                 } else {
-                    c1.card.classList.add('wrong'); c2.card.classList.add('wrong');
+                    // Sai -> Chèn class wrong
+                    c1.card.classList.add('wrong'); 
+                    c2.card.classList.add('wrong');
                     setTimeout(() => {
-                        c1.card.classList.remove('selected', 'wrong'); c2.card.classList.remove('selected', 'wrong');
+                        // Hết 1s trả lại class gốc
+                        c1.card.className = `card ${c1.baseClass}`; 
+                        c2.card.className = `card ${c2.baseClass}`;
                         selectedCards = []; canClick = true;
                     }, 1000);
                 }

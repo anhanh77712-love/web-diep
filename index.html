@@ -106,7 +106,7 @@
                 <button class="btn btn-info" onclick="startMatchingGame()"><i class="fas fa-sync-alt"></i> Làm mới</button>
             </div>
             <div style="text-align: center; margin-bottom: 15px; font-size: 14px; color: #888;">
-                <span style="display:inline-block; width: 15px; height: 15px; background: #f0f4ff; border: 1px solid #d2e3fc; border-radius: 3px; vertical-align: middle; margin-right: 5px;"></span> Tiếng Anh 
+                <span style="display:inline-block; width: 15px; height: 15px; background: #f0f4ff; border: 1px solid #d2e3fc; border-radius: 3px; vertical-align: middle; margin-right: 5px;"></span> Tiếng Anh (Click để nghe)
                 <span style="display:inline-block; width: 15px; height: 15px; background: #fff0f5; border: 1px solid #fce4ec; border-radius: 3px; vertical-align: middle; margin-left: 15px; margin-right: 5px;"></span> Tiếng Việt
             </div>
             <div id="gameBoard"></div>
@@ -163,7 +163,7 @@
             if (!window.speechSynthesis) return alert("Trình duyệt của bạn không hỗ trợ đọc giọng nói!");
             const utterance = new SpeechSynthesisUtterance(text);
             utterance.lang = 'en-US'; // Giọng tiếng Anh Mỹ
-            utterance.rate = 0.9;     // Tốc độ đọc hơi chậm lại một chút cho dễ nghe
+            utterance.rate = 0.9;     // Tốc độ đọc
             window.speechSynthesis.speak(utterance);
         }
 
@@ -182,19 +182,16 @@
             pronunInput.value = "Đang lấy phép thuật...";
             
             try {
-                // Sử dụng Free Dictionary API (Miễn phí, không cần Key)
                 const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
                 if (!res.ok) throw new Error("Not found");
                 const data = await res.json();
                 
                 let phonetic = '';
-                // Tìm kiếm trong mảng phonetics để lấy phiên âm có chứa ký tự văn bản
                 if (data[0].phonetics && data[0].phonetics.length > 0) {
                     for (let ph of data[0].phonetics) {
                         if (ph.text) { phonetic = ph.text; break; }
                     }
                 }
-                // Dự phòng nếu API trả về cấu trúc khác
                 if (!phonetic && data[0].phonetic) phonetic = data[0].phonetic;
 
                 if (phonetic) {
@@ -259,9 +256,7 @@
                 document.getElementById('detMean').innerText = word.mean;
                 document.getElementById('detExample').innerText = word.examples || '(Chưa có)';
                 
-                // Gán sự kiện đọc từ vựng cho nút cái loa trong Modal Chi Tiết
                 document.getElementById('btnReadDetail').onclick = () => speakWord(word.word);
-                
                 document.getElementById('detailModal').style.display = 'block';
             }
         }
@@ -332,7 +327,7 @@
             canClick = true;
         }
 
-        // --- GAME DIỆP THÚI CÓ PHÂN BIỆT MÀU ---
+        // --- GAME DIỆP THÚI (ĐÃ CẬP NHẬT ĐỌC TỪ) ---
         let selectedCards = [], canClick = true;
         async function startMatchingGame() {
             document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang xào bài...</p>';
@@ -362,18 +357,27 @@
                 const card = document.createElement('div');
                 card.className = `card ${item.type}`;
                 card.innerText = item.text;
-                card.onclick = () => handleCardClick(card, item.id, item.type);
+                // Truyền thêm nội dung text vào hàm click để AI biết phải đọc gì
+                card.onclick = () => handleCardClick(card, item.id, item.type, item.text);
                 board.appendChild(card);
             });
         }
 
-        function handleCardClick(card, id, baseClass) {
+        // Hàm xử lý Click được bổ sung tính năng "Đọc từ"
+        function handleCardClick(card, id, baseClass, text) {
             if (!canClick || card.classList.contains('correct')) return;
             
+            // Nếu bấm lại vào chính thẻ đang chọn thì hủy chọn
             if (card.classList.contains('selected')) { 
                 card.className = `card ${baseClass}`; 
                 selectedCards = []; 
                 return; 
+            }
+
+            // --- NÂNG CẤP ---
+            // Nếu lật một thẻ mới và thẻ đó là Tiếng Anh thì tự động đọc
+            if (baseClass === 'type-word') {
+                speakWord(text);
             }
             
             card.className = `card ${baseClass} selected`; 

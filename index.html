@@ -18,7 +18,7 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; }
+        th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; vertical-align: middle; }
         th { background-color: rgba(168, 237, 234, 0.5); font-weight: 800; }
         
         .btn { padding: 8px 15px; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; }
@@ -26,6 +26,7 @@
         .btn-info { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: #333; }
         .btn-warning { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); }
         .btn-danger { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
+        .btn-audio { background: linear-gradient(135deg, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%); color: #e84393; font-size: 16px; border-radius: 50%; padding: 8px 12px; margin-left: 5px; }
         .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
         
         /* Modal Style */
@@ -47,23 +48,13 @@
         }
         .game-menu-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 20px rgba(255, 182, 193, 0.4); border-style: solid; }
 
-        /* --- NÚT GAME & PHÂN BIỆT MÀU SẮC TỪ/NGHĨA --- */
+        /* --- NÚT GAME & PHÂN BIỆT MÀU SẮC --- */
         #gameBoard { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; margin-top: 20px; }
-        
-        .card { 
-            border: 2px solid #eee; border-radius: 15px; padding: 20px 10px; text-align: center; 
-            font-weight: 800; cursor: pointer; transition: 0.3s; user-select: none;
-        }
-
-        /* Màu thẻ Từ Tiếng Anh (Xanh dương nhạt) */
+        .card { border: 2px solid #eee; border-radius: 15px; padding: 20px 10px; text-align: center; font-weight: 800; cursor: pointer; transition: 0.3s; user-select: none; }
         .card.type-word { background: #f0f4ff; border-color: #d2e3fc; color: #4a4a4a; }
         .card.type-word:hover { border-color: #a1c4fd; box-shadow: 0 4px 10px rgba(161, 196, 253, 0.3); }
-
-        /* Màu thẻ Nghĩa Tiếng Việt (Hồng đào nhạt) */
         .card.type-mean { background: #fff0f5; border-color: #fce4ec; color: #4a4a4a; }
         .card.type-mean:hover { border-color: #ffb6c1; box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3); }
-
-        /* Trạng thái Click, Đúng, Sai (Ghi đè màu mặc định) */
         .card.selected { background: #2d3436; color: white; border-color: #2d3436; transform: translateY(-8px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .card.correct { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #fff; border-color: #84fab0; transform: scale(0.95); pointer-events: none; }
         .card.wrong { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: white; border-color: #ff9a9e; animation: shake 0.4s ease; }
@@ -91,7 +82,7 @@
                     <th>Từ vựng</th>
                     <th>Dạng từ</th>
                     <th>Nghĩa</th>
-                    <th style="text-align: center; width: 180px;">Hành động</th>
+                    <th style="text-align: center; width: 220px;">Hành động</th>
                 </tr>
             </thead>
             <tbody id="wordTableBody"></tbody>
@@ -99,10 +90,8 @@
     </div>
 
     <div id="tab2" class="tab-content glass-panel">
-        
         <div id="gameMenuScreen" style="text-align: center;">
             <h2 style="color: #6c5ce7; margin-bottom: 30px;"><i class="fas fa-shapes"></i> Chọn trò chơi để bắt đầu</h2>
-            
             <div class="game-menu-card" onclick="openGame('diepthui')">
                 <i class="fas fa-heart" style="font-size: 50px; color: #ff7675; margin-bottom: 15px;"></i>
                 <h3 style="margin: 10px 0; color: #2d3436;">Diệp thúi đáng géc 🌸</h3>
@@ -122,13 +111,15 @@
             </div>
             <div id="gameBoard"></div>
         </div>
-
     </div>
 
     <div id="detailModal" class="modal-overlay">
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('detailModal')">&times;</span>
             <h3 style="color: #a1c4fd; text-align: center; font-size: 24px; margin-top: 0;"><i class="fas fa-search"></i> Chi Tiết Từ Vựng</h3>
+            <div style="text-align: center; margin-bottom: 15px;">
+                <button id="btnReadDetail" class="btn btn-audio" style="font-size: 24px; padding: 10px 15px;"><i class="fas fa-volume-up"></i></button>
+            </div>
             <table class="detail-table">
                 <tr><th>ID</th><td id="detId"></td></tr>
                 <tr><th>Từ vựng</th><td id="detWord" style="color: #6c5ce7; font-size: 18px;"></td></tr>
@@ -144,8 +135,19 @@
         <div class="modal-box">
             <span class="close-btn" onclick="closeModal('actionModal')">&times;</span>
             <h3 id="modalTitle" style="color: #ff8da1; text-align: center;">✨ Thêm Từ Mới ✨</h3>
-            <div class="form-group"><label>Từ tiếng Anh (*):</label><input type="text" id="inpWord"></div>
-            <div class="form-group"><label>Cách phát âm:</label><input type="text" id="inpPronun" placeholder="Ví dụ: /həˈləʊ/"></div>
+            
+            <div class="form-group">
+                <label>Từ tiếng Anh (*):</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="text" id="inpWord" style="flex: 1;" placeholder="Nhập từ cần tra...">
+                    <button class="btn btn-info" type="button" onclick="autoFetchPhonetic()" title="Tự động lấy phiên âm"><i class="fas fa-magic"></i> Lấy IPA</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Cách phát âm:</label>
+                <input type="text" id="inpPronun" placeholder="Ví dụ: /həˈləʊ/ (Click nút 'Lấy IPA' để tự động điền)">
+            </div>
             <div class="form-group"><label>Dạng từ (*):</label><input type="text" id="inpPart"></div>
             <div class="form-group"><label>Nghĩa tiếng Việt (*):</label><input type="text" id="inpMean"></div>
             <div class="form-group"><label>Ví dụ minh họa:</label><textarea id="inpExample" rows="3" placeholder="Nhập câu ví dụ..."></textarea></div>
@@ -156,6 +158,57 @@
     </div>
 
     <script>
+        // --- 1. TÍNH NĂNG ĐỌC TỪ VỰNG (TEXT TO SPEECH) ---
+        function speakWord(text) {
+            if (!window.speechSynthesis) return alert("Trình duyệt của bạn không hỗ trợ đọc giọng nói!");
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = 'en-US'; // Giọng tiếng Anh Mỹ
+            utterance.rate = 0.9;     // Tốc độ đọc hơi chậm lại một chút cho dễ nghe
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // --- 2. TÍNH NĂNG LẤY PHIÊN ÂM TỰ ĐỘNG ---
+        async function autoFetchPhonetic() {
+            const wordInput = document.getElementById('inpWord');
+            const pronunInput = document.getElementById('inpPronun');
+            const word = wordInput.value.trim().toLowerCase();
+            
+            if (!word) {
+                alert("Bạn phải nhập 'Từ tiếng Anh' trước khi lấy phiên âm nhé!");
+                wordInput.focus();
+                return;
+            }
+
+            pronunInput.value = "Đang lấy phép thuật...";
+            
+            try {
+                // Sử dụng Free Dictionary API (Miễn phí, không cần Key)
+                const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
+                if (!res.ok) throw new Error("Not found");
+                const data = await res.json();
+                
+                let phonetic = '';
+                // Tìm kiếm trong mảng phonetics để lấy phiên âm có chứa ký tự văn bản
+                if (data[0].phonetics && data[0].phonetics.length > 0) {
+                    for (let ph of data[0].phonetics) {
+                        if (ph.text) { phonetic = ph.text; break; }
+                    }
+                }
+                // Dự phòng nếu API trả về cấu trúc khác
+                if (!phonetic && data[0].phonetic) phonetic = data[0].phonetic;
+
+                if (phonetic) {
+                    pronunInput.value = phonetic;
+                } else {
+                    pronunInput.value = "";
+                    alert("Từ này khó quá, từ điển không có phiên âm rồi!");
+                }
+            } catch (err) {
+                pronunInput.value = "";
+                alert("Ôi không! Không tìm thấy từ này trong từ điển. Hãy kiểm tra lại chính tả nhé.");
+            }
+        }
+
         // --- LOGIC GIAO DIỆN CHUNG ---
         let currentWords = [];
         let editingId = null;
@@ -179,7 +232,10 @@
                     tbody.innerHTML += `
                         <tr>
                             <td><b>${w.id}</b></td>
-                            <td style="color: #6c5ce7; font-weight: bold; font-size: 18px;">${w.word}</td>
+                            <td style="color: #6c5ce7; font-weight: bold; font-size: 18px;">
+                                ${w.word} 
+                                <button class="btn btn-audio" onclick="speakWord('${w.word.replace(/'/g, "\\'")}')" title="Nghe đọc"><i class="fas fa-volume-up"></i></button>
+                            </td>
                             <td><em>${w.part_of_speech}</em></td>
                             <td>${w.mean}</td>
                             <td style="text-align: center;">
@@ -202,6 +258,10 @@
                 document.getElementById('detPart').innerText = word.part_of_speech;
                 document.getElementById('detMean').innerText = word.mean;
                 document.getElementById('detExample').innerText = word.examples || '(Chưa có)';
+                
+                // Gán sự kiện đọc từ vựng cho nút cái loa trong Modal Chi Tiết
+                document.getElementById('btnReadDetail').onclick = () => speakWord(word.word);
+                
                 document.getElementById('detailModal').style.display = 'block';
             }
         }
@@ -289,7 +349,6 @@
             const picked = data.sort(() => 0.5 - Math.random()).slice(0, 30);
             let gameData = [];
             
-            // Gắn thêm thuộc tính type để phân biệt màu sắc
             picked.forEach(w => {
                 gameData.push({ id: w.id, text: w.word, type: 'type-word' });
                 gameData.push({ id: w.id, text: w.mean, type: 'type-mean' });
@@ -301,7 +360,6 @@
             board.innerHTML = '';
             gameData.forEach(item => {
                 const card = document.createElement('div');
-                // Nạp class CSS tương ứng (xanh cho từ, hồng cho nghĩa)
                 card.className = `card ${item.type}`;
                 card.innerText = item.text;
                 card.onclick = () => handleCardClick(card, item.id, item.type);
@@ -312,30 +370,26 @@
         function handleCardClick(card, id, baseClass) {
             if (!canClick || card.classList.contains('correct')) return;
             
-            // Hủy chọn
             if (card.classList.contains('selected')) { 
-                card.className = `card ${baseClass}`; // Trả về màu gốc
+                card.className = `card ${baseClass}`; 
                 selectedCards = []; 
                 return; 
             }
             
-            card.className = `card ${baseClass} selected`; // Giữ màu gốc, thêm hiệu ứng đen
+            card.className = `card ${baseClass} selected`; 
             selectedCards.push({ card, id, baseClass });
 
             if (selectedCards.length === 2) {
                 canClick = false;
                 const [c1, c2] = selectedCards;
                 if (c1.id === c2.id) {
-                    // Đúng -> Xóa mọi class cũ, chèn class correct
                     c1.card.className = 'card correct'; 
                     c2.card.className = 'card correct';
                     selectedCards = []; canClick = true;
                 } else {
-                    // Sai -> Chèn class wrong
                     c1.card.classList.add('wrong'); 
                     c2.card.classList.add('wrong');
                     setTimeout(() => {
-                        // Hết 1s trả lại class gốc
                         c1.card.className = `card ${c1.baseClass}`; 
                         c2.card.className = `card ${c2.baseClass}`;
                         selectedCards = []; canClick = true;

@@ -28,6 +28,10 @@
         .btn-danger { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); }
         .btn-audio { background: linear-gradient(135deg, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%); color: #e84393; font-size: 16px; border-radius: 50%; padding: 8px 12px; margin-left: 5px; }
         .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
+
+        /* THANH TÌM KIẾM */
+        .search-box { padding: 10px 20px; border: 2px solid #e0e0e0; border-radius: 30px; font-size: 15px; width: 280px; outline: none; transition: 0.3s; font-family: 'Nunito', sans-serif; background: rgba(255,255,255,0.9); }
+        .search-box:focus { border-color: #ffb6c1; box-shadow: 0 0 12px rgba(255, 182, 193, 0.4); }
         
         /* Modal Style */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; }
@@ -73,7 +77,10 @@
     <div id="tab1" class="tab-content active glass-panel">
         <div style="display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center;">
             <h2 style="margin:0; color: #6c5ce7;"><i class="fas fa-list-ul"></i> Danh Sách Từ Vựng</h2>
-            <button class="btn btn-success" onclick="openAddModal()"><i class="fas fa-plus"></i> Thêm từ mới</button>
+            <div style="display: flex; gap: 15px;">
+                <input type="text" id="searchInput" class="search-box" placeholder="🔍 Tìm kiếm phép thuật..." onkeyup="searchWords()">
+                <button class="btn btn-success" onclick="openAddModal()" style="padding: 10px 20px;"><i class="fas fa-plus"></i> Thêm từ mới</button>
+            </div>
         </div>
         <table>
             <thead>
@@ -162,8 +169,8 @@
         function speakWord(text) {
             if (!window.speechSynthesis) return alert("Trình duyệt của bạn không hỗ trợ đọc giọng nói!");
             const utterance = new SpeechSynthesisUtterance(text);
-            utterance.lang = 'en-US'; // Giọng tiếng Anh Mỹ
-            utterance.rate = 0.9;     // Tốc độ đọc
+            utterance.lang = 'en-US'; 
+            utterance.rate = 0.9;     
             window.speechSynthesis.speak(utterance);
         }
 
@@ -206,6 +213,28 @@
             }
         }
 
+        // --- 3. TÌM KIẾM TỪ VỰNG ---
+        function searchWords() {
+            let input = document.getElementById("searchInput").value.toLowerCase();
+            let tr = document.getElementById("wordTableBody").getElementsByTagName("tr");
+            for (let i = 0; i < tr.length; i++) {
+                // Lấy cột Từ vựng (vị trí 1) và cột Nghĩa (vị trí 3)
+                let tdWord = tr[i].getElementsByTagName("td")[1];
+                let tdMean = tr[i].getElementsByTagName("td")[3];
+                
+                if (tdWord && tdMean) {
+                    let txtWord = tdWord.textContent || tdWord.innerText;
+                    let txtMean = tdMean.textContent || tdMean.innerText;
+                    
+                    if (txtWord.toLowerCase().indexOf(input) > -1 || txtMean.toLowerCase().indexOf(input) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+
         // --- LOGIC GIAO DIỆN CHUNG ---
         let currentWords = [];
         let editingId = null;
@@ -243,6 +272,9 @@
                         </tr>
                     `;
                 });
+                
+                // Giữ lại kết quả tìm kiếm nếu người dùng đang tìm kiếm mà dữ liệu được load lại
+                searchWords(); 
             } catch (err) { console.error("Lỗi tải dữ liệu", err); }
         }
 
@@ -327,7 +359,7 @@
             canClick = true;
         }
 
-        // --- GAME DIỆP THÚI (ĐÃ CẬP NHẬT ĐỌC TỪ) ---
+        // --- GAME DIỆP THÚI ---
         let selectedCards = [], canClick = true;
         async function startMatchingGame() {
             document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang xào bài...</p>';
@@ -357,25 +389,20 @@
                 const card = document.createElement('div');
                 card.className = `card ${item.type}`;
                 card.innerText = item.text;
-                // Truyền thêm nội dung text vào hàm click để AI biết phải đọc gì
                 card.onclick = () => handleCardClick(card, item.id, item.type, item.text);
                 board.appendChild(card);
             });
         }
 
-        // Hàm xử lý Click được bổ sung tính năng "Đọc từ"
         function handleCardClick(card, id, baseClass, text) {
             if (!canClick || card.classList.contains('correct')) return;
             
-            // Nếu bấm lại vào chính thẻ đang chọn thì hủy chọn
             if (card.classList.contains('selected')) { 
                 card.className = `card ${baseClass}`; 
                 selectedCards = []; 
                 return; 
             }
 
-            // --- NÂNG CẤP ---
-            // Nếu lật một thẻ mới và thẻ đó là Tiếng Anh thì tự động đọc
             if (baseClass === 'type-word') {
                 speakWord(text);
             }

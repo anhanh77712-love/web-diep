@@ -38,8 +38,11 @@
         .btn-audio { background: linear-gradient(135deg, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%); color: #e84393; font-size: 16px; border-radius: 50%; padding: 8px 12px; margin-left: 5px; }
         .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
 
-        /* INPUT TÌM KIẾM / NHẬP LIỆU */
-        .search-box { padding: 10px 20px; border: 2px solid #e0e0e0; border-radius: 30px; font-size: 15px; outline: none; transition: 0.3s; font-family: 'Nunito', sans-serif; background: rgba(255,255,255,0.9); }
+        /* HEADER TAB 1 & TÌM KIẾM (Đã Fix Lỗi) */
+        .tab-header { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; flex-wrap: wrap; gap: 15px;}
+        .action-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+        .action-buttons { display: flex; gap: 10px; align-items: center; }
+        .search-box { padding: 10px 20px; border: 2px solid #e0e0e0; border-radius: 30px; font-size: 15px; width: 280px; max-width: 100%; outline: none; transition: 0.3s; font-family: 'Nunito', sans-serif; background: rgba(255,255,255,0.9); }
         .search-box:focus { border-color: #ffb6c1; box-shadow: 0 0 12px rgba(255, 182, 193, 0.4); }
         
         /* MODAL */
@@ -135,7 +138,7 @@
         <div class="tab-header">
             <h2 style="margin:0; color: #6c5ce7;"><i class="fas fa-list-ul"></i> Từ Vựng</h2>
             <div class="action-bar">
-                <input type="text" id="searchInput" class="search-box" style="width: 250px;" placeholder="🔍 Tìm kiếm phép thuật..." onkeyup="searchWords()">
+                <input type="text" id="searchInput" class="search-box" placeholder="🔍 Tìm kiếm phép thuật..." onkeyup="searchWords()">
                 <div class="action-buttons">
                     <button class="btn btn-info" onclick="refreshList()" title="Làm mới danh sách"><i class="fas fa-sync-alt"></i></button>
                     <button class="btn btn-success" onclick="openAddModal()"><i class="fas fa-plus"></i> Thêm từ</button>
@@ -261,15 +264,12 @@
             const word = document.getElementById('aiInputWord').value.trim();
             if(!word) { alert("Hãy nhập một từ để AI phân tích nhé!"); return; }
 
-            // 1. Ẩn kết quả cũ, hiện loading
             document.getElementById('aiResultCard').style.display = 'none';
             document.getElementById('aiLoading').style.display = 'block';
 
-            // 2. Mô phỏng độ trễ của AI (giả vờ gọi API mất 2 giây)
             setTimeout(() => {
                 document.getElementById('aiLoading').style.display = 'none';
                 
-                // 3. Render giao diện Kết quả AI đẹp mắt (Đây là layout chuẩn, sau này bạn sẽ nối data thật vào đây)
                 const resultHTML = `
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
@@ -277,7 +277,7 @@
                             <span class="ai-phonetic">/${word.substring(0,4)}.../</span>
                             <button class="btn btn-audio" onclick="speakWord('${word}')" style="margin-top:-5px;"><i class="fas fa-volume-up"></i> Nghe đọc</button>
                         </div>
-                        <button class="btn btn-success" onclick="alert('Tính năng lưu thẳng vào CSDL đang được phát triển!')" title="Lưu vào Sổ tay"><i class="fas fa-save"></i> Lưu từ</button>
+                        <button class="btn btn-success" onclick="alert('Tính năng lưu thẳng vào Sổ tay đang được phát triển!')" title="Lưu vào Sổ tay"><i class="fas fa-save"></i> Lưu từ</button>
                     </div>
                     
                     <div class="ai-section">
@@ -311,11 +311,10 @@
                 resultCard.innerHTML = resultHTML;
                 resultCard.style.display = 'block';
 
-            }, 2000); // Đợi 2 giây
+            }, 2000); 
         }
 
-
-        // --- CÁC HÀM CŨ CỦA TAB 1 & TAB 2 (Giữ nguyên, thu gọn) ---
+        // --- TAB 1 & TAB 2 LOGIC ---
         async function autoFetchPhonetic() {
             const wInp = document.getElementById('inpWord'), pInp = document.getElementById('inpPronun');
             const w = wInp.value.trim().toLowerCase();
@@ -339,15 +338,18 @@
                 if (tW && tM) tr[i].style.display = ((tW.textContent||tW.innerText).toLowerCase().indexOf(input)>-1 || (tM.textContent||tM.innerText).toLowerCase().indexOf(input)>-1) ? "" : "none";
             }
         }
+        
         function refreshList() { document.getElementById("searchInput").value = ""; loadWords(); }
 
         let currentWords = [], editingId = null;
+        
         function openTab(evt, tabName) {
             document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
             document.querySelectorAll(".tab-links").forEach(el => el.classList.remove("active"));
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
+        
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
         async function loadWords() {
@@ -355,15 +357,22 @@
                 const res = await fetch('/api/words'); currentWords = await res.json();
                 const tbody = document.getElementById('wordTableBody'); tbody.innerHTML = '';
                 currentWords.forEach(w => {
-                    tbody.innerHTML += `<tr>
-                        <td><b>${w.id}</b></td>
-                        <td style="color:#6c5ce7;font-weight:bold;font-size:16px;">${w.word} <button class="btn btn-audio" onclick="speakWord('${w.word.replace(/'/g, "\\'")}')" style="font-size:14px;padding:5px 8px;"><i class="fas fa-volume-up"></i></button></td>
-                        <td><em>${w.part_of_speech}</em></td><td>${w.mean}</td>
-                        <td style="text-align:center;white-space:nowrap;">
-                            <button class="btn btn-info" onclick="showDetails(${w.id})"><i class="fas fa-eye"></i></button>
-                            <button class="btn btn-warning" onclick="openEditModal(${w.id})"><i class="fas fa-pen"></i></button>
-                            <button class="btn btn-danger" onclick="deleteWord(${w.id})"><i class="fas fa-trash"></i></button>
-                        </td></tr>`;
+                    tbody.innerHTML += `
+                        <tr>
+                            <td><b>${w.id}</b></td>
+                            <td style="color:#6c5ce7;font-weight:bold;font-size:16px;">
+                                ${w.word} 
+                                <button class="btn btn-audio" onclick="speakWord('${w.word.replace(/'/g, "\\'")}')" style="font-size:14px;padding:5px 8px;"><i class="fas fa-volume-up"></i></button>
+                            </td>
+                            <td><em>${w.part_of_speech}</em></td>
+                            <td>${w.mean}</td>
+                            <td style="text-align:center;white-space:nowrap;">
+                                <button class="btn btn-info" onclick="showDetails(${w.id})"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-warning" onclick="openEditModal(${w.id})"><i class="fas fa-pen"></i></button>
+                                <button class="btn btn-danger" onclick="deleteWord(${w.id})"><i class="fas fa-trash"></i></button>
+                            </td>
+                        </tr>
+                    `;
                 });
                 searchWords(); 
             } catch (err) { console.error("Lỗi", err); }
@@ -381,19 +390,23 @@
         }
 
         function openAddModal() { editingId = null; document.getElementById('modalTitle').innerText = '✨ Thêm Từ Mới ✨'; document.getElementById('inpWord').value=''; document.getElementById('inpPronun').value=''; document.getElementById('inpPart').value=''; document.getElementById('inpMean').value=''; document.getElementById('inpExample').value=''; document.getElementById('actionModal').style.display='block'; }
+        
         function openEditModal(id) { editingId = id; const w = currentWords.find(x => x.id === id); if(w) { document.getElementById('modalTitle').innerText = '🛠 Sửa Từ Vựng'; document.getElementById('inpWord').value = w.word; document.getElementById('inpPronun').value = w.pronunciation||''; document.getElementById('inpPart').value = w.part_of_speech; document.getElementById('inpMean').value = w.mean; document.getElementById('inpExample').value = w.examples||''; document.getElementById('actionModal').style.display='block'; } }
+        
         async function saveWord() {
             const d = { word: document.getElementById('inpWord').value, pronunciation: document.getElementById('inpPronun').value, part_of_speech: document.getElementById('inpPart').value, mean: document.getElementById('inpMean').value, examples: document.getElementById('inpExample').value };
             if(!d.word || !d.part_of_speech || !d.mean) return alert("Điền đủ các ô có dấu (*)");
             await fetch(editingId ? `/api/words/${editingId}` : '/api/add-word', { method: editingId?'PUT':'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
             closeModal('actionModal'); loadWords();
         }
+        
         async function deleteWord(id) { if(confirm("Xóa từ này nhé?")) { await fetch(`/api/words/${id}`, { method: 'DELETE' }); loadWords(); } }
 
         function openGame(t) { document.getElementById('gameMenuScreen').style.display='none'; document.getElementById('gamePlayScreen').style.display='block'; if(t==='diepthui') startMatchingGame(); }
         function backToGameMenu() { document.getElementById('gameMenuScreen').style.display='block'; document.getElementById('gamePlayScreen').style.display='none'; selectedCards=[]; canClick=true; }
 
         let selectedCards = [], canClick = true;
+        
         async function startMatchingGame() {
             document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang xào bài...</p>'; selectedCards = []; canClick = true;
             const res = await fetch('/api/words'); const data = await res.json();

@@ -379,7 +379,7 @@
             const res = await fetch('/api/words'); const data = await res.json();
             if (data.length < 2) { document.getElementById('gameBoard').innerHTML = '<p style="color: red;">Cần ít nhất 2 từ!</p>'; return; }
             let gameData = [];
-            data.sort(()=>0.5-Math.random()).slice(0,30).forEach(w => { gameData.push({id:w.id,text:w.word,type:'type-word'}, {id:w.id,text:w.mean,type:'type-mean'}); });
+            data.sort(()=>0.5-Math.random()).slice(0,20).forEach(w => { gameData.push({id:w.id,text:w.word,type:'type-word'}, {id:w.id,text:w.mean,type:'type-mean'}); });
             const board = document.getElementById('gameBoard'); board.innerHTML = '';
             gameData.sort(()=>0.5-Math.random()).forEach(item => {
                 const card = document.createElement('div'); card.className = `card ${item.type}`; card.innerText = item.text;

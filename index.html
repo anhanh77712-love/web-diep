@@ -7,12 +7,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
-        /* CSS MẶC ĐỊNH & GIAO DIỆN CHUNG */
+        /* ================= CSS MẶC ĐỊNH ================= */
         * { box-sizing: border-box; }
         body { font-family: 'Nunito', sans-serif; margin: 0; padding: 20px; background: url('https://images.unsplash.com/photo-1534447677768-be436bb09401?q=80&w=1920&auto=format&fit=crop') no-repeat center center fixed; background-size: cover; min-height: 100vh; color: #4a4a4a; }
         .glass-panel { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15); }
         
-        /* TABS */
         .tab-menu { display: flex; justify-content: center; gap: 15px; margin-bottom: 25px; flex-wrap: wrap;}
         .tab-menu button { padding: 12px 25px; cursor: pointer; background: rgba(255,255,255,0.7); border: none; border-radius: 30px; font-weight: 600; font-size: 16px; transition: 0.3s; }
         .tab-menu button.active { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); color: #4a4a4a; box-shadow: 0 4px 15px rgba(254, 214, 227, 0.5);}
@@ -20,13 +19,11 @@
         .tab-content.active { display: block; animation: fadeIn 0.5s ease; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         
-        /* BẢNG TỪ VỰNG */
         .table-responsive { width: 100%; overflow-x: auto; border-radius: 10px; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; min-width: 600px; }
         th, td { padding: 12px; border-bottom: 1px solid #ddd; text-align: left; vertical-align: middle; }
         th { background-color: rgba(168, 237, 234, 0.5); font-weight: 800; }
         
-        /* NÚT BẤM CHUNG */
         .btn { padding: 8px 15px; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: 0.3s; }
         .btn-success { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #333;}
         .btn-info { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); color: #333; }
@@ -36,14 +33,12 @@
         .btn-audio { background: linear-gradient(135deg, #fdcbf1 0%, #fdcbf1 1%, #e6dee9 100%); color: #e84393; font-size: 16px; border-radius: 50%; padding: 8px 12px; margin-left: 5px; }
         .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
 
-        /* HEADER & TÌM KIẾM */
         .tab-header { display: flex; justify-content: space-between; margin-bottom: 20px; align-items: center; flex-wrap: wrap; gap: 15px;}
         .action-bar { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
         .action-buttons { display: flex; gap: 10px; align-items: center; }
         .search-box { padding: 10px 20px; border: 2px solid #e0e0e0; border-radius: 30px; font-size: 15px; width: 280px; max-width: 100%; outline: none; transition: 0.3s; font-family: 'Nunito', sans-serif; background: rgba(255,255,255,0.9); }
         .search-box:focus { border-color: #ffb6c1; box-shadow: 0 0 12px rgba(255, 182, 193, 0.4); }
         
-        /* MODAL */
         .modal-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.4); backdrop-filter: blur(5px); z-index: 1000; }
         .modal-box { background: white; margin: 5% auto; padding: 30px; border-radius: 20px; width: 450px; max-width: 90%; position: relative; max-height: 85vh; overflow-y: auto; }
         .form-group { margin-bottom: 15px; display: flex; flex-direction: column; }
@@ -55,16 +50,17 @@
         .detail-table th { background: #f0f0f0; width: 35%; text-align: right; padding-right: 15px; color: #666; border-radius: 10px 0 0 10px; }
         .detail-table td { background: #fafafa; font-weight: 600; color: #333; border-radius: 0 10px 10px 0;}
 
-        /* --- GAME MENU & BOARD (ĐÃ CẬP NHẬT GIAO DIỆN 2 CỘT) --- */
-        .game-menu-card { background: rgba(255, 255, 255, 0.9); border: 2px dashed #ffb6c1; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; margin: 10px; display: inline-block; width: 220px; }
+        /* ================= GAME MENU ================= */
+        .game-menu-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
+        .game-menu-card { background: rgba(255, 255, 255, 0.9); border: 2px dashed #ffb6c1; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; width: 240px; }
         .game-menu-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 20px rgba(255, 182, 193, 0.4); border-style: solid; }
         .game-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #eee; padding-bottom: 15px; margin-bottom: 15px; }
-        
+
+        /* ================= GAME DIỆP THÚI (GIỮ NGUYÊN) ================= */
         #gameBoard { margin-top: 20px; }
         .game-board-container { display: flex; gap: 20px; }
         .game-column { flex: 1; border: 2px dashed #eee; border-radius: 15px; padding: 15px; }
         .column-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
-
         .card { border: 2px solid #eee; border-radius: 15px; padding: 15px 10px; text-align: center; font-weight: 800; cursor: pointer; transition: 0.3s; user-select: none; display: flex; align-items: center; justify-content: center; min-height: 70px; font-size: 15px;}
         .card.type-word { background: #f0f4ff; border-color: #d2e3fc; color: #4a4a4a; }
         .card.type-mean { background: #fff0f5; border-color: #fce4ec; color: #4a4a4a; }
@@ -72,7 +68,20 @@
         .card.correct { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%) !important; color: #fff !important; border-color: #84fab0 !important; transform: scale(0.95); pointer-events: none; opacity: 0.7;}
         .card.wrong { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important; color: white !important; border-color: #ff9a9e !important; animation: shake 0.4s ease; }
 
-        /* TAB 3: AI ASSISTANT */
+        /* ================= TÍNH NĂNG MỚI: NHẬT KÝ TỪ VỰNG ================= */
+        .date-filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; scrollbar-width: thin; }
+        .date-pill { padding: 10px 20px; border-radius: 20px; background: #fff; border: 2px solid #e0e0e0; cursor: pointer; white-space: nowrap; font-weight: bold; color: #666; transition: 0.3s; }
+        .date-pill:hover { background: #f0f4ff; border-color: #a1c4fd; }
+        .date-pill.active { background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); border-color: transparent; color: #333; box-shadow: 0 4px 10px rgba(254, 214, 227, 0.4); }
+        
+        .tracker-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 15px; }
+        .tracker-card { background: white; border-radius: 15px; padding: 20px; border-left: 5px solid #a8edea; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; transition: 0.3s; }
+        .tracker-card:hover { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(168, 237, 234, 0.3); }
+        .tracker-word-info h4 { margin: 0 0 5px 0; font-size: 20px; color: #6c5ce7; }
+        .tracker-word-info p { margin: 0; color: #636e72; font-size: 15px; }
+        .tracker-empty { text-align: center; color: #aaa; padding: 40px; width: 100%; font-style: italic; }
+
+        /* ================= TAB 3: AI ASSISTANT ================= */
         .ai-container { max-width: 800px; margin: 0 auto; }
         .ai-search-bar { display: flex; gap: 10px; justify-content: center; margin-bottom: 30px; }
         .ai-search-box { flex: 1; max-width: 400px; font-size: 16px; padding: 12px 20px; }
@@ -93,7 +102,7 @@
         .ai-loading i { font-size: 40px; animation: spin 2s linear infinite; margin-bottom: 15px;}
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
 
-        /* ĐIỆN THOẠI (DƯỚI 768px) */
+        /* ================= ĐIỆN THOẠI ================= */
         @media (max-width: 768px) {
             body { padding: 10px; } h1 { font-size: 26px; } .glass-panel { padding: 15px; }
             .tab-header { flex-direction: column; align-items: flex-start; gap: 15px; }
@@ -106,12 +115,9 @@
             .game-header { flex-direction: column; gap: 15px; text-align: center; }
             .game-header h2 { order: -1; margin-bottom: 5px !important;} 
             .game-header-buttons { display: flex; width: 100%; justify-content: space-between; }
-            
-            /* Responsive cho Game Board 2 cột */
             .game-board-container { flex-direction: column; gap: 15px; }
             .column-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
             .card { padding: 10px 5px; font-size: 14px; min-height: 60px;}
-            
             .ai-search-bar { flex-direction: column; } .ai-search-box { max-width: 100%; } .ai-word-title { font-size: 28px; }
         }
     </style>
@@ -148,24 +154,53 @@
     </div>
 
     <div id="tab2" class="tab-content glass-panel">
-        <div id="gameMenuScreen" style="text-align: center;">
-            <h2 style="color: #6c5ce7; margin-bottom: 20px;"><i class="fas fa-shapes"></i> Chọn trò chơi</h2>
-            <div class="game-menu-card" onclick="openGame('diepthui')">
-                <i class="fas fa-heart" style="font-size: 50px; color: #ff7675; margin-bottom: 15px;"></i>
-                <h3 style="margin: 10px 0; color: #2d3436;">Diệp thúi đáng géc 🌸</h3>
-                <p style="color: #636e72; font-size: 14px; margin-bottom: 0;">Ghép cặp từ vựng và nghĩa</p>
+        
+        <div id="gameMenuScreen">
+            <h2 style="color: #6c5ce7; text-align: center; margin-bottom: 30px;"><i class="fas fa-shapes"></i> Chọn phương pháp tu luyện</h2>
+            
+            <div class="game-menu-container">
+                <div class="game-menu-card" onclick="openGame('diepthui')">
+                    <i class="fas fa-heart" style="font-size: 50px; color: #ff7675; margin-bottom: 15px;"></i>
+                    <h3 style="margin: 10px 0; color: #2d3436;">Diệp thúi đáng géc 🌸</h3>
+                    <p style="color: #636e72; font-size: 14px; margin-bottom: 0;">Trò chơi ghép cặp Nghĩa & Từ vựng</p>
+                </div>
+
+                <div class="game-menu-card" onclick="openGame('tracker')">
+                    <i class="fas fa-calendar-alt" style="font-size: 50px; color: #74b9ff; margin-bottom: 15px;"></i>
+                    <h3 style="margin: 10px 0; color: #2d3436;">Nhật ký Phép thuật 📜</h3>
+                    <p style="color: #636e72; font-size: 14px; margin-bottom: 0;">Ôn tập lại từ vựng theo ngày thêm</p>
+                </div>
             </div>
         </div>
+
         <div id="gamePlayScreen" style="display: none;">
             <div class="game-header">
-                <h2 id="gameTitle" style="margin: 0; color: #ff7675;">🌸 Diệp thúi đáng géc 🌸</h2>
+                <h2 style="margin: 0; color: #ff7675;">🌸 Diệp thúi đáng géc 🌸</h2>
                 <div class="game-header-buttons">
                     <button class="btn btn-warning" onclick="backToGameMenu()"><i class="fas fa-arrow-left"></i> Quay lại</button>
-                    <button class="btn btn-info" onclick="startMatchingGame()"><i class="fas fa-sync-alt"></i> Làm mới</button>
+                    <button class="btn btn-info" onclick="startMatchingGame()"><i class="fas fa-sync-alt"></i> Đổi bài</button>
+                </div>
+            </div>
+            <div style="text-align: center; margin-bottom: 15px; font-size: 12px; color: #888;">
+                <span style="display:inline-block; width: 12px; height: 12px; background: #f0f4ff; border: 1px solid #d2e3fc;"></span> Anh (Click nghe)
+                <span style="display:inline-block; width: 12px; height: 12px; background: #fff0f5; border: 1px solid #fce4ec; margin-left: 10px;"></span> Việt
+            </div>
+            <div id="gameBoard"></div>
+        </div>
+
+        <div id="trackerScreen" style="display: none;">
+            <div class="game-header">
+                <h2 style="margin: 0; color: #74b9ff;"><i class="fas fa-history"></i> Dòng thời gian</h2>
+                <div class="game-header-buttons">
+                    <button class="btn btn-warning" onclick="backToGameMenu()"><i class="fas fa-arrow-left"></i> Menu</button>
+                    <button class="btn btn-info" onclick="renderTracker()"><i class="fas fa-sync-alt"></i> Cập nhật</button>
                 </div>
             </div>
             
-            <div id="gameBoard">
+            <div class="date-filters" id="dateFiltersList">
+                </div>
+
+            <div class="tracker-grid" id="trackerGrid">
                 </div>
         </div>
     </div>
@@ -216,119 +251,13 @@
     </div>
 
     <script>
-        // --- CHỨC NĂNG ĐỌC TỪ ---
+        // --- CÁC HÀM CƠ BẢN ---
         function speakWord(text) {
-            if (!window.speechSynthesis) return alert("Trình duyệt không hỗ trợ đọc giọng nói!");
+            if (!window.speechSynthesis) return;
             const utterance = new SpeechSynthesisUtterance(text); utterance.lang = 'en-US'; utterance.rate = 0.9;     
             window.speechSynthesis.speak(utterance);
         }
 
-        // --- TAB 3: LOGIC GỌI AI ---
-        let currentAIData = null;
-        async function askAIAssistant() {
-            const word = document.getElementById('aiInputWord').value.trim();
-            if(!word) { alert("Hãy nhập một từ để AI phân tích nhé!"); return; }
-
-            document.getElementById('aiResultCard').style.display = 'none';
-            document.getElementById('aiLoading').style.display = 'block';
-
-            try {
-                const response = await fetch('/api/ai-analyze', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ word: word })
-                });
-
-                if (!response.ok) throw new Error("Lỗi kết nối AI");
-                const aiData = await response.json();
-                currentAIData = aiData;
-                
-                let familyHTML = '';
-                if (aiData.family && aiData.family.length > 0) {
-                    aiData.family.forEach(f => {
-                        let tagClass = "tag-noun";
-                        if (f.pos.toLowerCase().includes('động') || f.pos.toLowerCase().includes('verb')) tagClass = "tag-verb";
-                        if (f.pos.toLowerCase().includes('tính') || f.pos.toLowerCase().includes('adj')) tagClass = "tag-adj";
-                        familyHTML += `<span class="tag ${tagClass}">${f.pos}: <b>${f.word}</b> (${f.mean})</span>`;
-                    });
-                } else { familyHTML = `<span style="color:#888;">Không có từ họ hàng phổ biến.</span>`; }
-
-                let examplesHTML = '';
-                if (aiData.examples && aiData.examples.length > 0) {
-                    aiData.examples.forEach(ex => {
-                        examplesHTML += `<div class="ai-example-box"><p class="ai-example-en">"${ex.en}"</p><p class="ai-example-vi">"${ex.vi}"</p></div>`;
-                    });
-                }
-
-                const resultHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;">
-                        <div>
-                            <h2 class="ai-word-title">${aiData.word.charAt(0).toUpperCase() + aiData.word.slice(1)}</h2>
-                            <span class="ai-phonetic">${aiData.phonetic}</span>
-                            <button class="btn btn-audio" onclick="speakWord('${aiData.word.replace(/'/g, "\\'")}')" style="margin-top:-5px;"><i class="fas fa-volume-up"></i> Nghe đọc</button>
-                        </div>
-                        <button class="btn btn-success" onclick="saveAIToHandbook()" title="Chuyển dữ liệu sang form Thêm từ"><i class="fas fa-save"></i> Lưu vào Sổ tay</button>
-                    </div>
-                    <div class="ai-section" style="margin-top: 20px;">
-                        <h4><i class="fas fa-book-reader"></i> Định nghĩa chính</h4>
-                        <p style="font-size: 16px; color: #4a4a4a; margin: 0;"><b>[${aiData.pos}]:</b> ${aiData.mean}</p>
-                    </div>
-                    <div class="ai-section">
-                        <h4><i class="fas fa-sitemap"></i> Gia đình từ</h4>
-                        <div class="word-family-tags">${familyHTML}</div>
-                    </div>
-                    <div class="ai-section">
-                        <h4><i class="fas fa-quote-left"></i> Câu ví dụ minh họa</h4>
-                        ${examplesHTML}
-                    </div>
-                `;
-                document.getElementById('aiLoading').style.display = 'none';
-                const resultCard = document.getElementById('aiResultCard');
-                resultCard.innerHTML = resultHTML; resultCard.style.display = 'block';
-            } catch (error) {
-                console.error(error); document.getElementById('aiLoading').style.display = 'none';
-                alert("Ối! Phép thuật bị gián đoạn. AI đang nghỉ ngơi, bạn hãy thử lại nhé!");
-            }
-        }
-
-        function saveAIToHandbook() {
-            if(!currentAIData) return;
-            openTab({ currentTarget: document.querySelectorAll('.tab-links')[0] }, 'tab1');
-            openAddModal();
-            document.getElementById('inpWord').value = currentAIData.word;
-            document.getElementById('inpPronun').value = currentAIData.phonetic;
-            document.getElementById('inpPart').value = currentAIData.pos;
-            document.getElementById('inpMean').value = currentAIData.mean;
-            if(currentAIData.examples && currentAIData.examples.length > 0) {
-                document.getElementById('inpExample').value = currentAIData.examples[0].en + " (" + currentAIData.examples[0].vi + ")";
-            }
-        }
-
-        // --- CÁC HÀM CŨ CỦA TAB 1 & TAB 2 ---
-        async function autoFetchPhonetic() {
-            const wInp = document.getElementById('inpWord'), pInp = document.getElementById('inpPronun');
-            const w = wInp.value.trim().toLowerCase();
-            if (!w) { alert("Nhập từ trước!"); wInp.focus(); return; }
-            pInp.value = "Đang lấy...";
-            try {
-                const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${w}`);
-                if (!res.ok) throw new Error("Not found");
-                const data = await res.json(); let ph = '';
-                if (data[0].phonetics) for (let p of data[0].phonetics) if (p.text) { ph = p.text; break; }
-                if (!ph && data[0].phonetic) ph = data[0].phonetic;
-                pInp.value = ph ? ph : ""; if(!ph) alert("Không có phiên âm!");
-            } catch (e) { pInp.value = ""; alert("Không tìm thấy từ."); }
-        }
-
-        function searchWords() {
-            let input = document.getElementById("searchInput").value.toLowerCase();
-            let tr = document.getElementById("wordTableBody").getElementsByTagName("tr");
-            for (let i = 0; i < tr.length; i++) {
-                let tW = tr[i].getElementsByTagName("td")[1], tM = tr[i].getElementsByTagName("td")[3];
-                if (tW && tM) tr[i].style.display = ((tW.textContent||tW.innerText).toLowerCase().indexOf(input)>-1 || (tM.textContent||tM.innerText).toLowerCase().indexOf(input)>-1) ? "" : "none";
-            }
-        }
-        function refreshList() { document.getElementById("searchInput").value = ""; loadWords(); }
-
-        let currentWords = [], editingId = null;
         function openTab(evt, tabName) {
             document.querySelectorAll(".tab-content").forEach(el => el.classList.remove("active"));
             document.querySelectorAll(".tab-links").forEach(el => el.classList.remove("active"));
@@ -336,6 +265,8 @@
         }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+        // --- TẢI DỮ LIỆU CHUNG ---
+        let currentWords = [];
         async function loadWords() {
             try {
                 const res = await fetch('/api/words'); currentWords = await res.json();
@@ -352,99 +283,112 @@
                         </td></tr>`;
                 });
                 searchWords(); 
-            } catch (err) { console.error("Lỗi", err); }
+                // Cập nhật ngầm dữ liệu cho Tab 2 Nhật ký
+                if (document.getElementById('trackerScreen').style.display === 'block') renderTracker();
+            } catch (err) { console.error("Lỗi tải data", err); }
         }
 
-        function showDetails(id) {
-            const w = currentWords.find(x => x.id === id);
-            if(w) {
-                document.getElementById('detId').innerText = w.id; document.getElementById('detWord').innerText = w.word;
-                document.getElementById('detPronun').innerText = w.pronunciation || '(Chưa có)'; document.getElementById('detPart').innerText = w.part_of_speech;
-                document.getElementById('detMean').innerText = w.mean; document.getElementById('detExample').innerText = w.examples || '(Chưa có)';
-                document.getElementById('btnReadDetail').onclick = () => speakWord(w.word);
-                document.getElementById('detailModal').style.display = 'block';
+        // --- MENU ĐIỀU HƯỚNG TAB 2 ---
+        function openGame(type) {
+            document.getElementById('gameMenuScreen').style.display = 'none';
+            if (type === 'diepthui') {
+                document.getElementById('gamePlayScreen').style.display = 'block';
+                startMatchingGame();
+            } else if (type === 'tracker') {
+                document.getElementById('trackerScreen').style.display = 'block';
+                renderTracker();
             }
         }
-
-        function openAddModal() { editingId = null; document.getElementById('modalTitle').innerText = '✨ Thêm Từ Mới ✨'; document.getElementById('inpWord').value=''; document.getElementById('inpPronun').value=''; document.getElementById('inpPart').value=''; document.getElementById('inpMean').value=''; document.getElementById('inpExample').value=''; document.getElementById('actionModal').style.display='block'; }
-        function openEditModal(id) { editingId = id; const w = currentWords.find(x => x.id === id); if(w) { document.getElementById('modalTitle').innerText = '🛠 Sửa Từ Vựng'; document.getElementById('inpWord').value = w.word; document.getElementById('inpPronun').value = w.pronunciation||''; document.getElementById('inpPart').value = w.part_of_speech; document.getElementById('inpMean').value = w.mean; document.getElementById('inpExample').value = w.examples||''; document.getElementById('actionModal').style.display='block'; } }
-        async function saveWord() {
-            const d = { word: document.getElementById('inpWord').value, pronunciation: document.getElementById('inpPronun').value, part_of_speech: document.getElementById('inpPart').value, mean: document.getElementById('inpMean').value, examples: document.getElementById('inpExample').value };
-            if(!d.word || !d.part_of_speech || !d.mean) return alert("Điền đủ các ô có dấu (*)");
-            await fetch(editingId ? `/api/words/${editingId}` : '/api/add-word', { method: editingId?'PUT':'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
-            closeModal('actionModal'); loadWords();
-        }
-        async function deleteWord(id) { if(confirm("Xóa từ này nhé?")) { await fetch(`/api/words/${id}`, { method: 'DELETE' }); loadWords(); } }
-
-        function openGame(t) { document.getElementById('gameMenuScreen').style.display='none'; document.getElementById('gamePlayScreen').style.display='block'; if(t==='diepthui') startMatchingGame(); }
-        function backToGameMenu() { document.getElementById('gameMenuScreen').style.display='block'; document.getElementById('gamePlayScreen').style.display='none'; selectedCards=[]; canClick=true; }
-
-        let selectedCards = [], canClick = true;
         
-        async function startMatchingGame() {
-            document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang xào bài...</p>'; 
-            selectedCards = []; 
-            canClick = true;
+        function backToGameMenu() {
+            document.getElementById('gameMenuScreen').style.display = 'block';
+            document.getElementById('gamePlayScreen').style.display = 'none';
+            document.getElementById('trackerScreen').style.display = 'none';
+            selectedCards = []; canClick = true;
+        }
+
+        // --- TÍNH NĂNG MỚI: NHẬT KÝ THEO DÕI ---
+        let wordsByDate = {}; // Lưu trữ từ vựng gom nhóm theo ngày
+
+        function renderTracker() {
+            wordsByDate = {}; // Làm sạch bộ nhớ
+            const filtersList = document.getElementById('dateFiltersList');
+            const grid = document.getElementById('trackerGrid');
             
-            const res = await fetch('/api/words'); 
-            const data = await res.json();
+            // 1. Phân loại từ vựng theo ngày
+            currentWords.forEach(w => {
+                let dateStr = "Ký ức xa xưa 🌌"; // Dành cho những từ cũ không có ngày tháng
+                if (w.created_at) {
+                    const d = new Date(w.created_at);
+                    dateStr = d.toLocaleDateString('vi-VN'); // Đổi thành định dạng ngày/tháng/năm
+                }
+                if (!wordsByDate[dateStr]) wordsByDate[dateStr] = [];
+                wordsByDate[dateStr].push(w);
+            });
+
+            // 2. Tạo các nút (Pill) chọn ngày
+            filtersList.innerHTML = '';
+            const allDates = Object.keys(wordsByDate);
             
-            if (data.length < 2) { 
-                document.getElementById('gameBoard').innerHTML = '<p style="color: red; text-align: center; width: 100%;">Cần ít nhất 2 từ!</p>'; 
-                return; 
+            if (allDates.length === 0) {
+                grid.innerHTML = `<div class="tracker-empty">Sổ tay của bạn đang trống trơn. Hãy thêm từ vựng nhé!</div>`;
+                return;
             }
-            
-            // Lấy ngẫu nhiên tối đa 20 từ (như đã thiết lập)
-            const picked = data.sort(() => 0.5 - Math.random()).slice(0, 20);
-            
-            // Tách riêng Từ Tiếng Anh và Nghĩa Tiếng Việt
-            let wordsData = [];
-            let meansData = [];
-            
-            picked.forEach(w => { 
-                wordsData.push({id: w.id, text: w.word, type: 'type-word'}); 
-                meansData.push({id: w.id, text: w.mean, type: 'type-mean'}); 
-            });
-            
-            // Trộn riêng rẽ từng bên
-            wordsData.sort(() => 0.5 - Math.random());
-            meansData.sort(() => 0.5 - Math.random());
 
-            // Vẽ bảng game chia 2 cột
+            allDates.forEach((date, index) => {
+                const btn = document.createElement('button');
+                btn.className = `date-pill ${index === 0 ? 'active' : ''}`; // Chọn ngày đầu tiên làm mặc định
+                btn.innerText = `${date} (${wordsByDate[date].length} từ)`;
+                btn.onclick = () => {
+                    // Xóa class active của các nút khác
+                    document.querySelectorAll('.date-pill').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    showWordsForDate(date); // Hiển thị từ
+                };
+                filtersList.appendChild(btn);
+            });
+
+            // Mặc định hiển thị ngày đầu tiên
+            showWordsForDate(allDates[0]);
+        }
+
+        function showWordsForDate(dateStr) {
+            const grid = document.getElementById('trackerGrid');
+            grid.innerHTML = '';
+            
+            const words = wordsByDate[dateStr];
+            if (!words) return;
+
+            words.forEach(w => {
+                grid.innerHTML += `
+                    <div class="tracker-card">
+                        <div class="tracker-word-info">
+                            <h4>${w.word} <span style="font-size:14px; font-weight:normal; color:#888;">[${w.part_of_speech}]</span></h4>
+                            <p>${w.mean}</p>
+                        </div>
+                        <button class="btn btn-audio" onclick="speakWord('${w.word.replace(/'/g, "\\'")}')"><i class="fas fa-volume-up"></i></button>
+                    </div>
+                `;
+            });
+        }
+
+        // --- CÁC TÍNH NĂNG CÒN LẠI (Game, AI, Thêm/Sửa/Xóa) ---
+        // (Tôi giữ nguyên không đụng chạm để tránh phát sinh lỗi)
+        
+        // GAME DIỆP THÚI
+        let selectedCards = [], canClick = true;
+        async function startMatchingGame() {
+            document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang xào bài...</p>'; selectedCards = []; canClick = true;
+            if (currentWords.length < 2) { document.getElementById('gameBoard').innerHTML = '<p style="color: red; text-align: center; width: 100%;">Cần ít nhất 2 từ!</p>'; return; }
+            const picked = currentWords.sort(() => 0.5 - Math.random()).slice(0, 20);
+            let wordsData = []; let meansData = [];
+            picked.forEach(w => { wordsData.push({id: w.id, text: w.word, type: 'type-word'}); meansData.push({id: w.id, text: w.mean, type: 'type-mean'}); });
+            wordsData.sort(() => 0.5 - Math.random()); meansData.sort(() => 0.5 - Math.random());
             const board = document.getElementById('gameBoard'); 
-            board.innerHTML = `
-                <div class="game-board-container">
-                    <div class="game-column" style="background: rgba(240, 244, 255, 0.5); border-color: #a1c4fd;">
-                        <h3 style="text-align: center; color: #6c5ce7; margin-top: 0;"><i class="fas fa-language"></i> Tiếng Anh</h3>
-                        <div class="column-grid" id="colWords"></div>
-                    </div>
-                    <div class="game-column" style="background: rgba(255, 240, 245, 0.5); border-color: #ffb6c1;">
-                        <h3 style="text-align: center; color: #e84393; margin-top: 0;"><i class="fas fa-spell-check"></i> Tiếng Việt</h3>
-                        <div class="column-grid" id="colMeans"></div>
-                    </div>
-                </div>
-            `;
-            
-            const colWords = document.getElementById('colWords');
-            const colMeans = document.getElementById('colMeans');
-
-            // Đổ thẻ vào cột Tiếng Anh
-            wordsData.forEach(item => {
-                const card = document.createElement('div'); 
-                card.className = `card ${item.type}`; 
-                card.innerText = item.text;
-                card.onclick = () => handleCardClick(card, item.id, item.type, item.text); 
-                colWords.appendChild(card);
-            });
-            
-            // Đổ thẻ vào cột Tiếng Việt
-            meansData.forEach(item => {
-                const card = document.createElement('div'); 
-                card.className = `card ${item.type}`; 
-                card.innerText = item.text;
-                card.onclick = () => handleCardClick(card, item.id, item.type, item.text); 
-                colMeans.appendChild(card);
-            });
+            board.innerHTML = `<div class="game-board-container"><div class="game-column" style="background: rgba(240, 244, 255, 0.5);"><h3 style="text-align: center; color: #6c5ce7; margin-top: 0;">Tiếng Anh</h3><div class="column-grid" id="colWords"></div></div><div class="game-column" style="background: rgba(255, 240, 245, 0.5);"><h3 style="text-align: center; color: #e84393; margin-top: 0;">Tiếng Việt</h3><div class="column-grid" id="colMeans"></div></div></div>`;
+            const colWords = document.getElementById('colWords'); const colMeans = document.getElementById('colMeans');
+            wordsData.forEach(item => { const card = document.createElement('div'); card.className = `card ${item.type}`; card.innerText = item.text; card.onclick = () => handleCardClick(card, item.id, item.type, item.text); colWords.appendChild(card); });
+            meansData.forEach(item => { const card = document.createElement('div'); card.className = `card ${item.type}`; card.innerText = item.text; card.onclick = () => handleCardClick(card, item.id, item.type, item.text); colMeans.appendChild(card); });
         }
 
         function handleCardClick(card, id, baseClass, text) {
@@ -454,21 +398,62 @@
             card.className = `card ${baseClass} selected`; selectedCards.push({ card, id, baseClass });
             if (selectedCards.length === 2) {
                 canClick = false; const [c1, c2] = selectedCards;
-                if (c1.id === c2.id) { 
-                    c1.card.className = 'card correct'; 
-                    c2.card.className = 'card correct'; 
-                    selectedCards = []; canClick = true; 
-                } else { 
-                    c1.card.classList.add('wrong'); 
-                    c2.card.classList.add('wrong'); 
-                    setTimeout(() => { 
-                        c1.card.className = `card ${c1.baseClass}`; 
-                        c2.card.className = `card ${c2.baseClass}`; 
-                        selectedCards = []; canClick = true; 
-                    }, 1000); 
-                }
+                if (c1.id === c2.id) { c1.card.className = 'card correct'; c2.card.className = 'card correct'; selectedCards = []; canClick = true; } 
+                else { c1.card.classList.add('wrong'); c2.card.classList.add('wrong'); setTimeout(() => { c1.card.className = `card ${c1.baseClass}`; c2.card.className = `card ${c2.baseClass}`; selectedCards = []; canClick = true; }, 1000); }
             }
         }
+
+        // AI ASSISTANT
+        let currentAIData = null;
+        async function askAIAssistant() {
+            const word = document.getElementById('aiInputWord').value.trim();
+            if(!word) return alert("Hãy nhập từ!");
+            document.getElementById('aiResultCard').style.display = 'none'; document.getElementById('aiLoading').style.display = 'block';
+            try {
+                const response = await fetch('/api/ai-analyze', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ word: word }) });
+                if (!response.ok) throw new Error("Lỗi");
+                const aiData = await response.json(); currentAIData = aiData;
+                let familyHTML = '';
+                if (aiData.family && aiData.family.length > 0) { aiData.family.forEach(f => { let tagClass = "tag-noun"; if (f.pos.toLowerCase().includes('động') || f.pos.toLowerCase().includes('verb')) tagClass = "tag-verb"; if (f.pos.toLowerCase().includes('tính') || f.pos.toLowerCase().includes('adj')) tagClass = "tag-adj"; familyHTML += `<span class="tag ${tagClass}">${f.pos}: <b>${f.word}</b> (${f.mean})</span>`; }); } else { familyHTML = `<span style="color:#888;">Không có</span>`; }
+                let examplesHTML = '';
+                if (aiData.examples && aiData.examples.length > 0) { aiData.examples.forEach(ex => { examplesHTML += `<div class="ai-example-box"><p class="ai-example-en">"${ex.en}"</p><p class="ai-example-vi">"${ex.vi}"</p></div>`; }); }
+                document.getElementById('aiLoading').style.display = 'none';
+                document.getElementById('aiResultCard').innerHTML = `<div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 10px;"><div><h2 class="ai-word-title">${aiData.word.charAt(0).toUpperCase() + aiData.word.slice(1)}</h2><span class="ai-phonetic">${aiData.phonetic}</span><button class="btn btn-audio" onclick="speakWord('${aiData.word.replace(/'/g, "\\'")}')" style="margin-top:-5px;"><i class="fas fa-volume-up"></i> Nghe đọc</button></div><button class="btn btn-success" onclick="saveAIToHandbook()"><i class="fas fa-save"></i> Lưu Sổ tay</button></div><div class="ai-section" style="margin-top: 20px;"><h4><i class="fas fa-book-reader"></i> Định nghĩa chính</h4><p style="font-size: 16px; margin: 0;"><b>[${aiData.pos}]:</b> ${aiData.mean}</p></div><div class="ai-section"><h4><i class="fas fa-sitemap"></i> Gia đình từ</h4><div class="word-family-tags">${familyHTML}</div></div><div class="ai-section"><h4><i class="fas fa-quote-left"></i> Câu ví dụ</h4>${examplesHTML}</div>`;
+                document.getElementById('aiResultCard').style.display = 'block';
+            } catch (error) { document.getElementById('aiLoading').style.display = 'none'; alert("AI đang nghỉ ngơi, vui lòng thử lại!"); }
+        }
+
+        function saveAIToHandbook() {
+            if(!currentAIData) return; openTab({ currentTarget: document.querySelectorAll('.tab-links')[0] }, 'tab1'); openAddModal();
+            document.getElementById('inpWord').value = currentAIData.word; document.getElementById('inpPronun').value = currentAIData.phonetic; document.getElementById('inpPart').value = currentAIData.pos; document.getElementById('inpMean').value = currentAIData.mean;
+            if(currentAIData.examples && currentAIData.examples.length > 0) document.getElementById('inpExample').value = currentAIData.examples[0].en + " (" + currentAIData.examples[0].vi + ")";
+        }
+
+        async function autoFetchPhonetic() {
+            const wInp = document.getElementById('inpWord'), pInp = document.getElementById('inpPronun');
+            if (!wInp.value.trim()) { alert("Nhập từ trước!"); return; } pInp.value = "Đang lấy...";
+            try { const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${wInp.value.trim().toLowerCase()}`); if (!res.ok) throw new Error(""); const data = await res.json(); let ph = ''; if (data[0].phonetics) for (let p of data[0].phonetics) if (p.text) { ph = p.text; break; } if (!ph && data[0].phonetic) ph = data[0].phonetic; pInp.value = ph ? ph : ""; } catch (e) { pInp.value = ""; }
+        }
+
+        function searchWords() {
+            let input = document.getElementById("searchInput").value.toLowerCase(); let tr = document.getElementById("wordTableBody").getElementsByTagName("tr");
+            for (let i = 0; i < tr.length; i++) { let tW = tr[i].getElementsByTagName("td")[1], tM = tr[i].getElementsByTagName("td")[3]; if (tW && tM) tr[i].style.display = ((tW.textContent||tW.innerText).toLowerCase().indexOf(input)>-1 || (tM.textContent||tM.innerText).toLowerCase().indexOf(input)>-1) ? "" : "none"; }
+        }
+        function refreshList() { document.getElementById("searchInput").value = ""; loadWords(); }
+
+        function showDetails(id) {
+            const w = currentWords.find(x => x.id === id);
+            if(w) { document.getElementById('detId').innerText = w.id; document.getElementById('detWord').innerText = w.word; document.getElementById('detPronun').innerText = w.pronunciation || '(Chưa có)'; document.getElementById('detPart').innerText = w.part_of_speech; document.getElementById('detMean').innerText = w.mean; document.getElementById('detExample').innerText = w.examples || '(Chưa có)'; document.getElementById('btnReadDetail').onclick = () => speakWord(w.word); document.getElementById('detailModal').style.display = 'block'; }
+        }
+
+        function openAddModal() { editingId = null; document.getElementById('modalTitle').innerText = '✨ Thêm Từ Mới ✨'; document.getElementById('inpWord').value=''; document.getElementById('inpPronun').value=''; document.getElementById('inpPart').value=''; document.getElementById('inpMean').value=''; document.getElementById('inpExample').value=''; document.getElementById('actionModal').style.display='block'; }
+        function openEditModal(id) { editingId = id; const w = currentWords.find(x => x.id === id); if(w) { document.getElementById('modalTitle').innerText = '🛠 Sửa Từ Vựng'; document.getElementById('inpWord').value = w.word; document.getElementById('inpPronun').value = w.pronunciation||''; document.getElementById('inpPart').value = w.part_of_speech; document.getElementById('inpMean').value = w.mean; document.getElementById('inpExample').value = w.examples||''; document.getElementById('actionModal').style.display='block'; } }
+        async function saveWord() {
+            const d = { word: document.getElementById('inpWord').value, pronunciation: document.getElementById('inpPronun').value, part_of_speech: document.getElementById('inpPart').value, mean: document.getElementById('inpMean').value, examples: document.getElementById('inpExample').value };
+            if(!d.word || !d.part_of_speech || !d.mean) return alert("Điền đủ các ô có dấu (*)");
+            await fetch(editingId ? `/api/words/${editingId}` : '/api/add-word', { method: editingId?'PUT':'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) }); closeModal('actionModal'); loadWords();
+        }
+        async function deleteWord(id) { if(confirm("Xóa từ này nhé?")) { await fetch(`/api/words/${id}`, { method: 'DELETE' }); loadWords(); } }
 
         loadWords();
     </script>

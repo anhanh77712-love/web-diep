@@ -25,19 +25,35 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false }
 });
-
 pool.connect(async (err, client, release) => {
   if (err) return console.error('Lỗi kết nối database:', err.message);
   console.log('✨ Đã kết nối Supabase PostgreSQL!');
   try {
-    await client.query(`CREATE TABLE IF NOT EXISTS vocabulary (id SERIAL PRIMARY KEY, word TEXT NOT NULL, part_of_speech TEXT NOT NULL, mean TEXT NOT NULL, pronunciation TEXT DEFAULT '', examples TEXT DEFAULT '')`);
-  } catch (error) { console.error('Lỗi khởi tạo bảng:', error); } finally { if(release) release(); }
+    // Tạo bảng với cột thời gian
+    await client.query(`CREATE TABLE IF NOT EXISTS vocabulary (
+      id SERIAL PRIMARY KEY, 
+      word TEXT NOT NULL, 
+      part_of_speech TEXT NOT NULL, 
+      mean TEXT NOT NULL, 
+      pronunciation TEXT DEFAULT '', 
+      examples TEXT DEFAULT '',
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    )`);
+    // Nâng cấp bảng cũ (Thêm cột thời gian cho các từ đã có sẵn)
+    await client.query(`ALTER TABLE vocabulary ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP`);
+  } catch (error) { 
+    console.error('Lỗi khởi tạo bảng:', error); 
+  } finally { 
+    if(release) release(); 
+  }
 });
+
+
 
 // --- CÁC API TỪ VỰNG ---
 app.get('/api/words', async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM vocabulary ORDER BY id DESC');
+    const result = await pool.query('SELECT * FROM vocabulary ORDER BY created_at DESC, id DESC');
     res.json(result.rows);
   } catch (err) { res.status(500).json({ error: err.message }); }
 });

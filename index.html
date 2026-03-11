@@ -54,9 +54,9 @@
         .game-menu-container { display: flex; justify-content: center; flex-wrap: wrap; gap: 20px; }
         .game-menu-card { background: rgba(255, 255, 255, 0.9); border: 2px dashed #ffb6c1; border-radius: 20px; padding: 30px; text-align: center; cursor: pointer; transition: 0.3s; width: 240px; }
         .game-menu-card:hover { transform: translateY(-5px); background: #fff; box-shadow: 0 10px 20px rgba(255, 182, 193, 0.4); border-style: solid; }
-        .game-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #eee; padding-bottom: 15px; margin-bottom: 15px; }
+        .game-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px dashed #eee; padding-bottom: 15px; margin-bottom: 15px; flex-wrap: wrap; gap: 15px;}
 
-        /* ================= GAME DIỆP THÚI (GIỮ NGUYÊN) ================= */
+        /* ================= GAME DIỆP THÚI ================= */
         #gameBoard { margin-top: 20px; }
         .game-board-container { display: flex; gap: 20px; }
         .game-column { flex: 1; border: 2px dashed #eee; border-radius: 15px; padding: 15px; }
@@ -68,7 +68,7 @@
         .card.correct { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%) !important; color: #fff !important; border-color: #84fab0 !important; transform: scale(0.95); pointer-events: none; opacity: 0.7;}
         .card.wrong { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%) !important; color: white !important; border-color: #ff9a9e !important; animation: shake 0.4s ease; }
 
-        /* ================= TÍNH NĂNG MỚI: NHẬT KÝ TỪ VỰNG ================= */
+        /* ================= NHẬT KÝ TỪ VỰNG ================= */
         .date-filters { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 20px; scrollbar-width: thin; }
         .date-pill { padding: 10px 20px; border-radius: 20px; background: #fff; border: 2px solid #e0e0e0; cursor: pointer; white-space: nowrap; font-weight: bold; color: #666; transition: 0.3s; }
         .date-pill:hover { background: #f0f4ff; border-color: #a1c4fd; }
@@ -80,6 +80,10 @@
         .tracker-word-info h4 { margin: 0 0 5px 0; font-size: 20px; color: #6c5ce7; }
         .tracker-word-info p { margin: 0; color: #636e72; font-size: 15px; }
         .tracker-empty { text-align: center; color: #aaa; padding: 40px; width: 100%; font-style: italic; }
+
+        /* Ô LỌC LỊCH (MỚI) */
+        .date-picker-input { padding: 8px 15px; border: 2px solid #a1c4fd; border-radius: 20px; font-family: 'Nunito', sans-serif; outline: none; color: #4a4a4a; font-weight: bold; cursor: pointer; }
+        .date-picker-input:focus { box-shadow: 0 0 10px rgba(161, 196, 253, 0.5); }
 
         /* ================= TAB 3: AI ASSISTANT ================= */
         .ai-container { max-width: 800px; margin: 0 auto; }
@@ -114,7 +118,8 @@
             .game-menu-card { width: 100%; margin: 10px 0; }
             .game-header { flex-direction: column; gap: 15px; text-align: center; }
             .game-header h2 { order: -1; margin-bottom: 5px !important;} 
-            .game-header-buttons { display: flex; width: 100%; justify-content: space-between; }
+            .game-header-buttons { display: flex; width: 100%; justify-content: center; flex-wrap: wrap; gap: 10px; }
+            .date-picker-input { width: 100%; text-align: center; }
             .game-board-container { flex-direction: column; gap: 15px; }
             .column-grid { grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; }
             .card { padding: 10px 5px; font-size: 14px; min-height: 60px;}
@@ -168,7 +173,7 @@
                 <div class="game-menu-card" onclick="openGame('tracker')">
                     <i class="fas fa-calendar-alt" style="font-size: 50px; color: #74b9ff; margin-bottom: 15px;"></i>
                     <h3 style="margin: 10px 0; color: #2d3436;">Nhật ký Phép thuật 📜</h3>
-                    <p style="color: #636e72; font-size: 14px; margin-bottom: 0;">Ôn tập lại từ vựng theo ngày thêm</p>
+                    <p style="color: #636e72; font-size: 14px; margin-bottom: 0;">Tra cứu từ vựng theo ngày học</p>
                 </div>
             </div>
         </div>
@@ -191,9 +196,12 @@
         <div id="trackerScreen" style="display: none;">
             <div class="game-header">
                 <h2 style="margin: 0; color: #74b9ff;"><i class="fas fa-history"></i> Dòng thời gian</h2>
+                
                 <div class="game-header-buttons">
+                    <input type="date" id="specificDateFilter" class="date-picker-input" onchange="filterBySpecificDate()" title="Chọn một ngày cụ thể">
+                    
                     <button class="btn btn-warning" onclick="backToGameMenu()"><i class="fas fa-arrow-left"></i> Menu</button>
-                    <button class="btn btn-info" onclick="renderTracker()"><i class="fas fa-sync-alt"></i> Cập nhật</button>
+                    <button class="btn btn-info" onclick="renderTracker()" title="Tải lại toàn bộ"><i class="fas fa-sync-alt"></i></button>
                 </div>
             </div>
             
@@ -265,7 +273,7 @@
         }
         function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-        // --- TẢI DỮ LIỆU CHUNG ---
+        // --- TẢI DỮ LIỆU ---
         let currentWords = [];
         async function loadWords() {
             try {
@@ -283,12 +291,10 @@
                         </td></tr>`;
                 });
                 searchWords(); 
-                // Cập nhật ngầm dữ liệu cho Tab 2 Nhật ký
                 if (document.getElementById('trackerScreen').style.display === 'block') renderTracker();
             } catch (err) { console.error("Lỗi tải data", err); }
         }
 
-        // --- MENU ĐIỀU HƯỚNG TAB 2 ---
         function openGame(type) {
             document.getElementById('gameMenuScreen').style.display = 'none';
             if (type === 'diepthui') {
@@ -307,20 +313,29 @@
             selectedCards = []; canClick = true;
         }
 
-        // --- TÍNH NĂNG MỚI: NHẬT KÝ THEO DÕI ---
-        let wordsByDate = {}; // Lưu trữ từ vựng gom nhóm theo ngày
+        // ================= TÍNH NĂNG NHẬT KÝ THEO DÕI NÂNG CẤP =================
+        let wordsByDate = {}; 
+
+        // Hàm định dạng ngày chuẩn DD/MM/YYYY cho mọi trình duyệt
+        function formatDateString(dateObj) {
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const y = dateObj.getFullYear();
+            return `${d}/${m}/${y}`;
+        }
 
         function renderTracker() {
-            wordsByDate = {}; // Làm sạch bộ nhớ
+            document.getElementById('specificDateFilter').value = ""; // Xóa dữ liệu ô tìm kiếm nếu bấm "Cập nhật"
+            wordsByDate = {}; 
             const filtersList = document.getElementById('dateFiltersList');
             const grid = document.getElementById('trackerGrid');
             
-            // 1. Phân loại từ vựng theo ngày
+            // 1. Phân loại từ vựng
             currentWords.forEach(w => {
-                let dateStr = "Ký ức xa xưa 🌌"; // Dành cho những từ cũ không có ngày tháng
+                let dateStr = "Ký ức xa xưa 🌌"; 
                 if (w.created_at) {
-                    const d = new Date(w.created_at);
-                    dateStr = d.toLocaleDateString('vi-VN'); // Đổi thành định dạng ngày/tháng/năm
+                    const dObj = new Date(w.created_at);
+                    dateStr = formatDateString(dObj);
                 }
                 if (!wordsByDate[dateStr]) wordsByDate[dateStr] = [];
                 wordsByDate[dateStr].push(w);
@@ -337,25 +352,44 @@
 
             allDates.forEach((date, index) => {
                 const btn = document.createElement('button');
-                btn.className = `date-pill ${index === 0 ? 'active' : ''}`; // Chọn ngày đầu tiên làm mặc định
-                btn.innerText = `${date} (${wordsByDate[date].length} từ)`;
+                btn.className = `date-pill ${index === 0 ? 'active' : ''}`;
+                btn.innerText = `${date} (${wordsByDate[date].length})`;
                 btn.onclick = () => {
-                    // Xóa class active của các nút khác
                     document.querySelectorAll('.date-pill').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    showWordsForDate(date); // Hiển thị từ
+                    showWordsForDate(date); 
                 };
                 filtersList.appendChild(btn);
             });
 
-            // Mặc định hiển thị ngày đầu tiên
             showWordsForDate(allDates[0]);
+        }
+
+        // Lọc bằng Ô CHỌN LỊCH (Input Date)
+        function filterBySpecificDate() {
+            const dateVal = document.getElementById('specificDateFilter').value;
+            if(!dateVal) { renderTracker(); return; } // Nếu xóa ngày thì tải lại toàn bộ
+            
+            // Input date trả về dạng YYYY-MM-DD -> Đổi sang DD/MM/YYYY
+            const parts = dateVal.split('-');
+            const searchDateStr = `${parts[2]}/${parts[1]}/${parts[0]}`; 
+
+            // Bỏ chọn tất cả các nút Pill
+            document.querySelectorAll('.date-pill').forEach(b => b.classList.remove('active'));
+
+            const grid = document.getElementById('trackerGrid');
+            const words = wordsByDate[searchDateStr];
+            
+            if (!words || words.length === 0) {
+                grid.innerHTML = `<div class="tracker-empty">Trang nhật ký ngày ${searchDateStr} trống trơn. Bạn chưa học từ nào vào ngày này!</div>`;
+            } else {
+                showWordsForDate(searchDateStr);
+            }
         }
 
         function showWordsForDate(dateStr) {
             const grid = document.getElementById('trackerGrid');
             grid.innerHTML = '';
-            
             const words = wordsByDate[dateStr];
             if (!words) return;
 
@@ -372,10 +406,7 @@
             });
         }
 
-        // --- CÁC TÍNH NĂNG CÒN LẠI (Game, AI, Thêm/Sửa/Xóa) ---
-        // (Tôi giữ nguyên không đụng chạm để tránh phát sinh lỗi)
-        
-        // GAME DIỆP THÚI
+        // ================= GAME, AI, THÊM/SỬA/XÓA =================
         let selectedCards = [], canClick = true;
         async function startMatchingGame() {
             document.getElementById('gameBoard').innerHTML = '<p style="text-align:center; width: 100%;">Đang xào bài...</p>'; selectedCards = []; canClick = true;
@@ -403,7 +434,6 @@
             }
         }
 
-        // AI ASSISTANT
         let currentAIData = null;
         async function askAIAssistant() {
             const word = document.getElementById('aiInputWord').value.trim();
@@ -448,11 +478,13 @@
 
         function openAddModal() { editingId = null; document.getElementById('modalTitle').innerText = '✨ Thêm Từ Mới ✨'; document.getElementById('inpWord').value=''; document.getElementById('inpPronun').value=''; document.getElementById('inpPart').value=''; document.getElementById('inpMean').value=''; document.getElementById('inpExample').value=''; document.getElementById('actionModal').style.display='block'; }
         function openEditModal(id) { editingId = id; const w = currentWords.find(x => x.id === id); if(w) { document.getElementById('modalTitle').innerText = '🛠 Sửa Từ Vựng'; document.getElementById('inpWord').value = w.word; document.getElementById('inpPronun').value = w.pronunciation||''; document.getElementById('inpPart').value = w.part_of_speech; document.getElementById('inpMean').value = w.mean; document.getElementById('inpExample').value = w.examples||''; document.getElementById('actionModal').style.display='block'; } }
+        
         async function saveWord() {
             const d = { word: document.getElementById('inpWord').value, pronunciation: document.getElementById('inpPronun').value, part_of_speech: document.getElementById('inpPart').value, mean: document.getElementById('inpMean').value, examples: document.getElementById('inpExample').value };
             if(!d.word || !d.part_of_speech || !d.mean) return alert("Điền đủ các ô có dấu (*)");
             await fetch(editingId ? `/api/words/${editingId}` : '/api/add-word', { method: editingId?'PUT':'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) }); closeModal('actionModal'); loadWords();
         }
+        
         async function deleteWord(id) { if(confirm("Xóa từ này nhé?")) { await fetch(`/api/words/${id}`, { method: 'DELETE' }); loadWords(); } }
 
         loadWords();

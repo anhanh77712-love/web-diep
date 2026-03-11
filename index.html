@@ -459,10 +459,57 @@
             if(currentAIData.examples && currentAIData.examples.length > 0) document.getElementById('inpExample').value = currentAIData.examples[0].en + " (" + currentAIData.examples[0].vi + ")";
         }
 
+        // async function autoFetchPhonetic() {
+        //     const wInp = document.getElementById('inpWord'), pInp = document.getElementById('inpPronun');
+        //     if (!wInp.value.trim()) { alert("Nhập từ trước!"); return; } pInp.value = "Đang lấy...";
+        //     try { const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${wInp.value.trim().toLowerCase()}`); if (!res.ok) throw new Error(""); const data = await res.json(); let ph = ''; if (data[0].phonetics) for (let p of data[0].phonetics) if (p.text) { ph = p.text; break; } if (!ph && data[0].phonetic) ph = data[0].phonetic; pInp.value = ph ? ph : ""; } catch (e) { pInp.value = ""; }
+        // }
+        // --- 2. LẤY PHIÊN ÂM TỰ ĐỘNG (ĐÃ FIX LỖI) ---
         async function autoFetchPhonetic() {
-            const wInp = document.getElementById('inpWord'), pInp = document.getElementById('inpPronun');
-            if (!wInp.value.trim()) { alert("Nhập từ trước!"); return; } pInp.value = "Đang lấy...";
-            try { const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${wInp.value.trim().toLowerCase()}`); if (!res.ok) throw new Error(""); const data = await res.json(); let ph = ''; if (data[0].phonetics) for (let p of data[0].phonetics) if (p.text) { ph = p.text; break; } if (!ph && data[0].phonetic) ph = data[0].phonetic; pInp.value = ph ? ph : ""; } catch (e) { pInp.value = ""; }
+            const wInp = document.getElementById('inpWord');
+            const pInp = document.getElementById('inpPronun');
+            const word = wInp.value.trim().toLowerCase();
+            
+            // Kiểm tra xem đã nhập từ chưa
+            if (!word) { 
+                alert("Bạn phải nhập 'Từ tiếng Anh' trước khi lấy IPA nhé!"); 
+                wInp.focus(); 
+                return; 
+            }
+            
+            pInp.value = "Đang niệm chú lấy phiên âm...";
+            
+            try {
+                // Mã hóa khoảng trắng (để tra được cả cụm từ ngắn nếu có)
+                const urlWord = encodeURIComponent(word);
+                const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${urlWord}`);
+                
+                if (!res.ok) throw new Error("Không có trong từ điển");
+                
+                const data = await res.json();
+                let phonetic = '';
+                
+                // Lục tìm mọi ngóc ngách để lấy IPA
+                if (data[0].phonetics && data[0].phonetics.length > 0) {
+                    for (let p of data[0].phonetics) {
+                        if (p.text) { phonetic = p.text; break; }
+                    }
+                }
+                if (!phonetic && data[0].phonetic) {
+                    phonetic = data[0].phonetic;
+                }
+                
+                // Trả kết quả
+                if (phonetic) {
+                    pInp.value = phonetic;
+                } else {
+                    pInp.value = "";
+                    alert(`Từ điển có lưu từ "${word}" nhưng lại quên ghi phiên âm mất rồi!`);
+                }
+            } catch (e) {
+                pInp.value = "";
+                alert(`Lỗi: Không tìm thấy IPA của "${word}". (Mẹo: Từ điển thường không tra được cụm từ dài đâu nhé!)`);
+            }
         }
 
         function searchWords() {

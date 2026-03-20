@@ -198,13 +198,9 @@
                     <button class="btn btn-success" onclick="openTopicWordModal()"><i class="fas fa-plus"></i> Thêm từ vào chủ đề</button>
                 </div>
             </div>
-            <div class="table-responsive">
-                <table>
-                    <thead>
-                        <tr><th style="width: 50px;">ID</th><th>Từ vựng</th><th>Dạng từ</th><th>Nghĩa</th><th style="text-align: center; width: 180px;">Hành động</th></tr>
-                    </thead>
-                    <tbody id="topicWordTableBody"></tbody>
-                </table>
+           <!-- Danh sách từ vựng theo dạng thẻ Card -->
+            <div id="topicWordListContainer" class="tracker-grid" style="margin-top: 15px;">
+                <!-- Dữ liệu sẽ được JavaScript đổ vào đây -->
             </div>
         </div>
     </div>
@@ -363,16 +359,64 @@
 
         function openTopicDetail(topicId, topicName) { currentViewTopicId = topicId; document.getElementById('topicListView').style.display = 'none'; document.getElementById('topicDetailView').style.display = 'block'; document.getElementById('currentTopicTitle').innerHTML = `<i class="fas fa-folder-open"></i> Chủ đề: ${topicName}`; loadTopicWords(); }
         function backToTopicList() { currentViewTopicId = null; document.getElementById('topicListView').style.display = 'block'; document.getElementById('topicDetailView').style.display = 'none'; }
-        async function loadTopicWords() {
+       async function loadTopicWords() {
             if(!currentViewTopicId) return;
             try {
-                const res = await fetch(`/api/topics/${currentViewTopicId}/words`); currentTopicWords = await res.json();
-                const tbody = document.getElementById('topicWordTableBody'); tbody.innerHTML = '';
-                currentTopicWords.forEach(w => { tbody.innerHTML += `<tr><td><b>${w.id}</b></td><td style="color:#6c5ce7;font-weight:bold;">${w.word} <button class="btn btn-audio" onclick="speakWord('${w.word.replace(/'/g, "\\'")}')" style="font-size:12px;padding:4px 7px;"><i class="fas fa-volume-up"></i></button></td><td><em>${w.part_of_speech}</em></td><td>${w.mean}</td><td style="text-align:center;white-space:nowrap;"><button class="btn btn-info" onclick="showDetails(${w.id}, 'topic_word')"><i class="fas fa-eye"></i></button> <button class="btn btn-warning" onclick="openEditModal(${w.id}, true)"><i class="fas fa-pen"></i></button> <button class="btn btn-danger" onclick="deleteWord(${w.id}, true)"><i class="fas fa-trash"></i></button></td></tr>`; });
+                const res = await fetch(`/api/topics/${currentViewTopicId}/words`); 
+                currentTopicWords = await res.json();
+                
+                const container = document.getElementById('topicWordListContainer'); 
+                container.innerHTML = '';
+                
+                if(currentTopicWords.length === 0) {
+                    container.innerHTML = '<div class="tracker-empty">Chủ đề này chưa có từ vựng nào!</div>';
+                    return;
+                }
+
+                currentTopicWords.forEach(w => {
+                    // Xử lý hiển thị phiên âm và ví dụ (nếu có)
+                    const pronunHtml = w.pronunciation ? `<span style="color:#e84393; font-size:14px; margin-left:8px;">${w.pronunciation}</span>` : '';
+                    const exampleHtml = w.examples ? `<div style="margin-top:10px; font-style:italic; font-size:14px; color:#555; background:#f8f9fa; padding:10px; border-left:3px solid #a1c4fd; border-radius: 0 8px 8px 0;">${w.examples}</div>` : '';
+                    
+                    container.innerHTML += `
+                        <div class="tracker-card" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+                            <div style="display: flex; justify-content: space-between; width: 100%; align-items: center; border-bottom: 1px dashed #eee; padding-bottom: 10px;">
+                                <div class="tracker-word-info">
+                                    <h4 style="margin: 0; font-size: 20px; color: #6c5ce7;">
+                                        ${w.word} 
+                                        <span style="font-size:14px; font-weight:normal; color:#888;">[${w.part_of_speech}]</span>
+                                        ${pronunHtml}
+                                    </h4>
+                                </div>
+                                <div style="display: flex; gap: 5px;">
+                                    <button class="btn btn-audio" onclick="speakWord('${w.word.replace(/'/g, "\\'")}')" style="padding: 6px 10px; font-size: 13px;" title="Nghe đọc"><i class="fas fa-volume-up"></i></button>
+                                    <button class="btn btn-warning" onclick="openEditModal(${w.id}, true)" style="padding: 6px 10px; font-size: 13px;" title="Sửa"><i class="fas fa-pen"></i></button>
+                                    <button class="btn btn-danger" onclick="deleteWord(${w.id}, true)" style="padding: 6px 10px; font-size: 13px;" title="Xóa"><i class="fas fa-trash"></i></button>
+                                </div>
+                            </div>
+                            <div class="tracker-word-info" style="width: 100%; padding-top: 5px;">
+                                <p style="font-weight: bold; color: #2d3436; margin: 0;">Nghĩa: <span style="font-weight: normal; color: #636e72;">${w.mean}</span></p>
+                                ${exampleHtml}
+                            </div>
+                        </div>
+                    `; 
+                });
             } catch (err) { console.error(err); }
         }
-        function searchTopicWords() { let input = document.getElementById("searchTopicWordInput").value.toLowerCase(); let tr = document.getElementById("topicWordTableBody").getElementsByTagName("tr"); for (let i = 0; i < tr.length; i++) { let tW = tr[i].getElementsByTagName("td")[1], tM = tr[i].getElementsByTagName("td")[3]; if (tW && tM) tr[i].style.display = ((tW.textContent||tW.innerText).toLowerCase().indexOf(input)>-1 || (tM.textContent||tM.innerText).toLowerCase().indexOf(input)>-1) ? "" : "none"; } }
 
+        function searchTopicWords() { 
+            let input = document.getElementById("searchTopicWordInput").value.toLowerCase(); 
+            let cards = document.getElementById("topicWordListContainer").getElementsByClassName("tracker-card"); 
+            for (let i = 0; i < cards.length; i++) { 
+                // Lấy toàn bộ văn bản trong thẻ (bao gồm từ, nghĩa, loại từ) để tìm kiếm
+                let textContent = cards[i].innerText || cards[i].textContent; 
+                if (textContent.toLowerCase().indexOf(input) > -1) {
+                    cards[i].style.display = ""; 
+                } else {
+                    cards[i].style.display = "none"; 
+                }
+            } 
+        }
         // ================= XỬ LÝ CHUNG: THÊM/SỬA/XÓA TỪ VỰNG =================
         function openAddModal() { isEditingTopicWord = false; editingId = null; document.getElementById('modalTitle').innerText = '✨ Thêm Từ Mới ✨'; _clearForm(); document.getElementById('actionModal').style.display='block'; }
         function openTopicWordModal() { isEditingTopicWord = true; editingId = null; document.getElementById('modalTitle').innerText = '✨ Thêm Từ Vào Chủ Đề ✨'; _clearForm(); document.getElementById('actionModal').style.display='block'; }
